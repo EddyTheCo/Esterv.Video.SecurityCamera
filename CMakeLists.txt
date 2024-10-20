@@ -8,14 +8,16 @@ find_package(OpenCV REQUIRED)
 
 find_package(Boost REQUIRED COMPONENTS system log)
 
-# Add the executable (main.cpp)
-add_executable(BackgroundSubtractor src/main.cpp  src/tcp_server.cpp src/tcp_server.hpp src/camera_service.hpp src/camera_service.cpp)
+add_executable(server src/server.cpp  src/tcp_server.cpp src/tcp_server.hpp src/camera_service.hpp src/camera_service.cpp)
+
+add_executable(client src/client.cpp)
+
 
 # Link OpenCV libraries to the executable
-target_link_libraries(BackgroundSubtractor PRIVATE ${OpenCV_LIBS})
+target_link_libraries(server PRIVATE ${OpenCV_LIBS} Boost::system Boost::log)
 
-target_link_libraries(BackgroundSubtractor PRIVATE Boost::system Boost::log)
+target_link_libraries(client PRIVATE ${OpenCV_LIBS} Boost::system Boost::log)
 
-# Set C++ Standard
-set_property(TARGET BackgroundSubtractor PROPERTY CXX_STANDARD 17)
+
+set_property(TARGET server PROPERTY CXX_STANDARD 17)
 
