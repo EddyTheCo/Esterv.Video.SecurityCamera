@@ -24,6 +24,5 @@ class Server {
     boost::asio::ip::tcp::tcp::acceptor acceptor_;
 public:
     Server(boost::asio::io_context &io_context, unsigned short port);
-    void start() { doAccept(); }
 
 };

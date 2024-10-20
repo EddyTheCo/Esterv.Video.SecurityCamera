@@ -69,9 +69,16 @@ void Session::execute()
         CameraService::streamRecording(command_,id_);
     }
 }
+std::vector<uint8_t> size(uint32_t size)
+{
+    return std::vector<uint8_t>{static_cast<uint8_t>((size >> 24) & 0xFF),
+                                static_cast<uint8_t>((size >> 16) & 0xFF),
+                                static_cast<uint8_t>((size >> 8) & 0xFF),
+                                static_cast<uint8_t>(size & 0xFF)};
 
+}
 void Session::doWrite(const std::vector<uint8_t> &packet_data) {
-    std::vector<uint8_t> buf{};
+    std::vector<uint8_t> buf{size(packet_data.size())};
     buf.insert(buf.end(), packet_data.begin(), packet_data.end());
     auto self(shared_from_this());
     boost::asio::async_write(
@@ -88,7 +95,7 @@ void Session::doWrite(const std::vector<uint8_t> &packet_data) {
 
 Server::Server(boost::asio::io_context &io_context, unsigned short port)
     : acceptor_(io_context, boost::asio::ip::tcp::tcp::endpoint(
-                                boost::asio::ip::tcp::tcp::v4(), port)) {}
+                                boost::asio::ip::tcp::tcp::v4(), port)) {doAccept();}
 void Server::doAccept() {
     acceptor_.async_accept(
         [this](boost::system::error_code ec, tcp::socket socket) {
