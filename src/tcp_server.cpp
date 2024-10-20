@@ -9,16 +9,20 @@ std::unordered_map<size_t, std::shared_ptr<Session>> Session::sessions_;
 uint32_t Session::index_{0};
 
 Session::Session(boost::asio::ip::tcp::tcp::socket socket)
-    : socket_(std::move(socket)) { doRead();}
+    : socket_(std::move(socket)) { }
 
 void Session::doRead() {
+    BOOST_LOG_TRIVIAL(debug)
+    << __PRETTY_FUNCTION__ ;
     auto self(shared_from_this());
     sessions_.insert({index_, self});
     id_=index_;
     index_++;
     socket_.async_read_some(
-        boost::asio::buffer(&command_, 4),
+        boost::asio::buffer(&command_, 1),
         [this, self](boost::system::error_code ec, std::size_t length) {
+            BOOST_LOG_TRIVIAL(debug)
+            << "async_read_some";
             if (!ec) {
                 execute();
                 doRead();
@@ -31,8 +35,10 @@ void Session::doRead() {
         });
 }
 
-void Session::sendFrame(const std::vector<uint8_t> &frame, const uint32_t command, const uint32_t frame_index)
+void Session::sendFrame(const std::vector<uint8_t> &frame, const uint8_t command, const uint32_t frame_index)
 {
+    BOOST_LOG_TRIVIAL(debug)
+            << __PRETTY_FUNCTION__ << sessions_.size()<<" " << frame.size()<< " "<<command<<" "<<frame_index;
     for(auto & session:sessions_)
     {
         if(session.second->command_==command)
@@ -40,6 +46,7 @@ void Session::sendFrame(const std::vector<uint8_t> &frame, const uint32_t comman
             //command 1 stream realtime
             if(command==1u)
             {
+                BOOST_LOG_TRIVIAL(debug)<<"doWrite";
                 session.second->doWrite(frame);
             }
             else
@@ -64,21 +71,27 @@ void Session::sendFrame(const std::vector<uint8_t> &frame, const uint32_t comman
 
 void Session::execute()
 {
+
+    BOOST_LOG_TRIVIAL(debug)
+    << __PRETTY_FUNCTION__ << " " << (int)command_;
     if(command_>1)
     {
         CameraService::streamRecording(command_,id_);
     }
 }
-std::vector<uint8_t> size(uint32_t size)
+std::vector<uint8_t> size(uint16_t size)
 {
-    return std::vector<uint8_t>{static_cast<uint8_t>((size >> 24) & 0xFF),
-                                static_cast<uint8_t>((size >> 16) & 0xFF),
-                                static_cast<uint8_t>((size >> 8) & 0xFF),
+
+    BOOST_LOG_TRIVIAL(debug)
+    << __PRETTY_FUNCTION__ << " " << size;
+    return std::vector<uint8_t>{static_cast<uint8_t>((size >> 8) & 0xFF),
                                 static_cast<uint8_t>(size & 0xFF)};
 
 }
 void Session::doWrite(const std::vector<uint8_t> &packet_data) {
     std::vector<uint8_t> buf{size(packet_data.size())};
+    BOOST_LOG_TRIVIAL(debug)
+        << __PRETTY_FUNCTION__ << " buf[0]:" << (int)buf[0]<< " buf[1]:"<<(int)buf[1];
     buf.insert(buf.end(), packet_data.begin(), packet_data.end());
     auto self(shared_from_this());
     boost::asio::async_write(
@@ -100,7 +113,9 @@ void Server::doAccept() {
     acceptor_.async_accept(
         [this](boost::system::error_code ec, tcp::socket socket) {
             if (!ec) {
-                const auto session = Session(std::move(socket));
+                const auto session =
+                    std::shared_ptr<Session>(new Session(std::move(socket)));
+                session->doRead();
             }
             doAccept();
         });

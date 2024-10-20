@@ -13,6 +13,7 @@ std::string server_ip;
 uint32_t server_port;
 
 void receiveFrame(const std::size_t length) {
+    BOOST_LOG_TRIVIAL(debug) << __PRETTY_FUNCTION__<< length;
     static uint32_t frameSize{0};
     static std::vector<uint8_t> frame;
     static std::vector<uint8_t> size;
@@ -20,16 +21,20 @@ void receiveFrame(const std::size_t length) {
 
     std::size_t pos{0};
     while (pos < length) {
+        BOOST_LOG_TRIVIAL(debug)<<"data_received:"<<(int)data_received.at(pos)<< " pos:"<<pos;
         switch (state) {
         case ReadingState::Size:
+
             size.push_back(data_received.at(pos));
             if(size.size() == 2)
             {
-                frameSize = (static_cast<uint16_t>(size.at(0) & 0x0F) << 8);
+                frameSize = (static_cast<uint16_t>(size.at(0) & 0xFF) << 8);
                 frameSize = frameSize | (size.at(1) & 0xFF);
+                BOOST_LOG_TRIVIAL(debug) << "frameSize:"<< frameSize;
                 size.clear();
                 state=ReadingState::Data;
             }
+            ++pos;
             break;
         case ReadingState::Data:
             const auto take_size =
@@ -38,7 +43,11 @@ void receiveFrame(const std::size_t length) {
                       std::back_inserter(frame));
             pos += take_size;
             if (frame.size() == frameSize) {
-                cv::imshow("Grayscale Image", cv::imdecode(frame, cv::IMREAD_GRAYSCALE));
+                BOOST_LOG_TRIVIAL(debug) << "frame.size():"<< frame.size();
+                const auto grayImage= cv::imdecode(frame, cv::IMREAD_GRAYSCALE);
+                std::cout << "grayImage:" <<grayImage.size()<< std::endl;
+                cv::imshow("Grayscale Image", grayImage);
+                cv::waitKey(0);
                 state = ReadingState::Size;
                 frame.clear();
             }
@@ -92,13 +101,9 @@ int main(int argc, char *argv[])
 
     boost::system::error_code ec;
 
-    uint32_t command{1u};
-    const std::vector<uint8_t> request{static_cast<uint8_t>((command >> 24) & 0xFF),
-                         static_cast<uint8_t>((command >> 16) & 0xFF),
-                         static_cast<uint8_t>((command >> 8) & 0xFF),
-                         static_cast<uint8_t>(command & 0xFF)};
+    uint8_t command{1u};
     try {
-        socket.write_some(boost::asio::buffer(request),ec);
+        socket.write_some(boost::asio::buffer(&command,1),ec);
     } catch (...) {
         BOOST_LOG_TRIVIAL(info) << ec.message();
         tryToConnect(socket);

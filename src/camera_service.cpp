@@ -9,7 +9,7 @@ CameraService::CameraService()
         startMotionDetection();
     }).detach();
 }
-void CameraService::streamRecording(uint32_t command, uint32_t id)
+void CameraService::streamRecording(uint8_t command, uint8_t id)
 {
 
 }
