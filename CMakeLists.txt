@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Project name and version
-project(BackgroundSubtractorExample VERSION 1.0)
+project(SecurityCamera VERSION 1.0)
 
 # Find OpenCV package
 find_package(OpenCV REQUIRED)

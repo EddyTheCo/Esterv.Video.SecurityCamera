@@ -61,7 +61,7 @@ void CameraService::startMotionDetection()
             auto currentTime = std::chrono::steady_clock::now();
 
             if (is_recording) {
-                std::cout << "writing frame to :" << output_name << std::endl;
+
 
                 std::time_t now = std::time(nullptr);  // Get current time in seconds
                 char timestamp[100];
@@ -74,7 +74,7 @@ void CameraService::startMotionDetection()
                 writer.write(gray_frame);
                 double elapsedSeconds
                     = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
-                std::cout << "elapsedSeconds :" << elapsedSeconds << std::endl;
+
                 if (elapsedSeconds >= 10) {
                     is_recording = false;
                     std::cout << "writer.release();" << std::endl;
@@ -84,6 +84,7 @@ void CameraService::startMotionDetection()
             }
             std::vector<uint8_t> buffer;
             cv::imencode(".jpg", gray_frame, buffer);
+
             Session::sendFrame(buffer);
         }
 

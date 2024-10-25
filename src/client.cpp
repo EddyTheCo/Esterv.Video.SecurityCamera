@@ -6,34 +6,47 @@
 
 
 enum class ReadingState { Size, Data };
-enum MAX_SIZES : size_t { Data = 65000 };
+// The data size can be changed depending on the available memory
+enum MAX_SIZES : size_t { Data = 10000 };
 static std::array<uint8_t, MAX_SIZES::Data> data_received;
 
 std::string server_ip;
 uint32_t server_port;
 
+static uint32_t deserialize_uint32_t(const std::array<uint8_t, 4>& buf) {
+    BOOST_LOG_TRIVIAL(debug)
+    << __PRETTY_FUNCTION__ << " buf[0]:" << (int)buf[0]<< " buf[1]:"<<(int)buf[1]<< " buf[2]:"<<(int)buf[2]<< " buf[3]:"<<(int)buf[3];
+    return (static_cast<uint32_t>(buf[0]) << 24) |
+           (static_cast<uint32_t>(buf[1]) << 16) |
+           (static_cast<uint32_t>(buf[2]) << 8)  |
+           static_cast<uint32_t>(buf[3]);
+}
+
 void receiveFrame(const std::size_t length) {
     BOOST_LOG_TRIVIAL(debug) << __PRETTY_FUNCTION__<< length;
     static uint32_t frameSize{0};
     static std::vector<uint8_t> frame;
-    static std::vector<uint8_t> size;
+    static std::array<uint8_t,4> size;
+    static uint8_t size_pos{0};
     static ReadingState state{ReadingState::Size};
 
     std::size_t pos{0};
+
     while (pos < length) {
-        BOOST_LOG_TRIVIAL(debug)<<"data_received:"<<(int)data_received.at(pos)<< " pos:"<<pos;
+
         switch (state) {
         case ReadingState::Size:
+            size.at(size_pos)=data_received.at(pos);
 
-            size.push_back(data_received.at(pos));
-            if(size.size() == 2)
+            BOOST_LOG_TRIVIAL(debug)<<"size.at(size_pos):"<<(int)size.at(size_pos)<<" data_received.at(pos):"<<(int)data_received.at(pos);
+            if(++size_pos == 4)
             {
-                frameSize = (static_cast<uint16_t>(size.at(0) & 0xFF) << 8);
-                frameSize = frameSize | (size.at(1) & 0xFF);
+                frameSize = deserialize_uint32_t(size);
                 BOOST_LOG_TRIVIAL(debug) << "frameSize:"<< frameSize;
-                size.clear();
                 state=ReadingState::Data;
+                size_pos=0;
             }
+
             ++pos;
             break;
         case ReadingState::Data:
@@ -47,7 +60,8 @@ void receiveFrame(const std::size_t length) {
                 const auto grayImage= cv::imdecode(frame, cv::IMREAD_GRAYSCALE);
                 std::cout << "grayImage:" <<grayImage.size()<< std::endl;
                 cv::imshow("Grayscale Image", grayImage);
-                cv::waitKey(0);
+                cv::waitKey(1);
+
                 state = ReadingState::Size;
                 frame.clear();
             }
@@ -62,8 +76,10 @@ void doClientRead(boost::asio::ip::tcp::socket& socket) {
         boost::asio::buffer(data_received, MAX_SIZES::Data),
         [&](boost::system::error_code ec, std::size_t length) {
             if (!ec) {
+
                 receiveFrame(length);
                 doClientRead(socket);
+
             } else {
                 BOOST_LOG_TRIVIAL(error)
                 << __PRETTY_FUNCTION__ << " " << ec.message();
