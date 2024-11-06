@@ -1,29 +1,22 @@
-#include <boost/asio/io_context.hpp>
-#include <boost/log/trivial.hpp>
-#include <boost/asio.hpp>
-#include <opencv2/opencv.hpp>
+#include <QGuiApplication>
+#include <QQmlApplicationEngine>
+#include"tcp_client.hpp"
+
+#if defined(FORCE_STYLE)
+#include <QQuickStyle>
+#endif
 
 
+int main(int argc, char *argv[]) {
+    QGuiApplication app(argc, argv);
 
-int main(int argc, char *argv[])
-{
-    boost::asio::io_context io_context;
+#if defined(FORCE_STYLE)
+    QQuickStyle::setStyle(FORCE_STYLE);
+#endif
+    QQmlApplicationEngine engine;
+    engine.addImageProvider(QLatin1String("wasm"), new WasmImageProvider());
+    engine.addImportPath("qrc:/esterVtech.com/imports");
+    engine.loadFromModule("SecurityCamera", "Client");
 
-    boost::asio::ip::tcp::socket socket(io_context);
-    boost::asio::ip::tcp::resolver resolver{io_context};
-
-
-    tryToConnect(socket,resolver);
-
-    boost::system::error_code ec;
-
-    uint8_t command{1u};
-    try {
-        socket.write_some(boost::asio::buffer(&command,1),ec);
-    } catch (...) {
-        BOOST_LOG_TRIVIAL(info) << ec.message();
-        tryToConnect(socket,resolver);
-    }
-
-    io_context.run();
+    return app.exec();
 }
