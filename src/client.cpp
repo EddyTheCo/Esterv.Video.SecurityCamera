@@ -70,38 +70,50 @@ void receiveFrame(const std::size_t length) {
     }
 }
 
-void tryToConnect(boost::asio::ip::tcp::socket& socket);
-void doClientRead(boost::asio::ip::tcp::socket& socket) {
+void tryToConnect(boost::asio::ip::tcp::socket& socket, boost::asio::ip::tcp::resolver &resolver);
+void doClientRead(boost::asio::ip::tcp::socket& socket,boost::asio::ip::tcp::resolver& resolver) {
     socket.async_read_some(
         boost::asio::buffer(data_received, MAX_SIZES::Data),
         [&](boost::system::error_code ec, std::size_t length) {
             if (!ec) {
 
                 receiveFrame(length);
-                doClientRead(socket);
+                doClientRead(socket,resolver);
 
             } else {
                 BOOST_LOG_TRIVIAL(error)
                 << __PRETTY_FUNCTION__ << " " << ec.message();
-                tryToConnect(socket);
+                tryToConnect(socket,resolver);
             }
         });
 }
-void tryToConnect(boost::asio::ip::tcp::socket& socket) {
+void tryToConnect(boost::asio::ip::tcp::socket& socket,boost::asio::ip::tcp::resolver& resolver) {
     socket.close();
-    const boost::asio::ip::tcp::endpoint endpoint(
-        boost::asio::ip::address::from_string(server_ip),
-        server_port);
+    std::string host = "2.tcp.eu.ngrok.io";
+    std::string port = "12999";
     try {
-        socket.connect(endpoint);
-        doClientRead(socket);
-    } catch (...) {
-        BOOST_LOG_TRIVIAL(info) << "There is no LAN Server running at "
-                                << server_ip << ":" << server_port;
-        BOOST_LOG_TRIVIAL(info) << "Retrying in 5 seconds";
-        std::this_thread::sleep_for(std::chrono::seconds(5));
-        tryToConnect(socket);
+        // Resolve the host and port
+        auto const endpoints = resolver.resolve(host, port);
+
+        // Use the resolved results (e.g., iterate through them)
+        for (const auto& entry : endpoints) {
+            std::cout << "Resolved: " << entry.endpoint() << std::endl;
+        }
+
+        try {
+            boost::asio::connect(socket, endpoints);
+            doClientRead(socket,resolver);
+        } catch (...) {
+            BOOST_LOG_TRIVIAL(info) << "There is no LAN Server running";
+            BOOST_LOG_TRIVIAL(info) << "Retrying in 5 seconds";
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+            tryToConnect(socket,resolver);
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Error resolving host: " << e.what() << std::endl;
     }
+
+
 }
 
 
@@ -109,11 +121,11 @@ int main(int argc, char *argv[])
 {
     boost::asio::io_context io_context;
 
-    server_ip = "127.0.0.1";
-    server_port = 9999;
-
     boost::asio::ip::tcp::socket socket(io_context);
-    tryToConnect(socket);
+    boost::asio::ip::tcp::resolver resolver{io_context};
+
+
+    tryToConnect(socket,resolver);
 
     boost::system::error_code ec;
 
@@ -122,7 +134,7 @@ int main(int argc, char *argv[])
         socket.write_some(boost::asio::buffer(&command,1),ec);
     } catch (...) {
         BOOST_LOG_TRIVIAL(info) << ec.message();
-        tryToConnect(socket);
+        tryToConnect(socket,resolver);
     }
 
     io_context.run();
