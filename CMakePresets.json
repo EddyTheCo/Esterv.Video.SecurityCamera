@@ -1,0 +1,223 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "default-release-all",
+      "displayName": "Default Release",
+      "description": "Release Server and Client for the same arch",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "REPO_URL": "https://eddytheco.github.io/Esterv.Video.SecurityCamera"
+      }
+    },
+    {
+      "name": "default-release-client",
+      "inherits": "default-release",
+      "displayName": "Default Release Client",
+      "description": "Release Client only",
+      "cacheVariables": {
+        "BUILD_SERVER": "OFF"
+      }
+    },
+    {
+      "name": "default-release-server",
+      "inherits": "default-release",
+      "displayName": "Default Release Server",
+      "description": "Release Server only",
+      "cacheVariables": {
+        "BUILD_CLIENT": "OFF"
+      }
+    },
+    {
+      "name": "default-develop",
+      "displayName": "Default Config for development(Release)",
+      "description": "Release build type using Ninja generator, add tests and docs",
+      "inherits": "default-release",
+      "cacheVariables": {
+        "BUILD_DOCS": "ON"
+      }
+    },
+    {
+      "name": "default-develop-debug",
+      "displayName": "Default Config for development(Debug)",
+      "description": "Debug build type using Ninja generator",
+      "inherits": "default-develop",
+      "binaryDir": "${sourceDir}/build/debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "default-release-all",
+      "configurePreset": "default-release-all"
+    },
+    {
+      "name": "default-release-client",
+      "configurePreset": "default-release-client"
+    },
+    {
+      "name": "default-release-server",
+      "configurePreset": "default-release-server"
+    },
+    {
+      "name": "default-develop",
+      "configurePreset": "default-develop"
+    },
+    {
+      "name": "default-develop-debug",
+      "configurePreset": "default-develop-debug"
+    },
+    {
+      "name": "default-documentation",
+      "configurePreset": "default-develop",
+      "targets": "doxygen_docs"
+    },
+    {
+      "name": "default-qmllint",
+      "configurePreset": "default-develop",
+      "targets": "all_qmllint_json"
+    }
+  ],
+  "workflowPresets": [
+    {
+      "name": "default-release-all",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "default-release-all"
+        },
+        {
+          "type": "build",
+          "name": "default-release-all"
+        }
+      ]
+    },
+    {
+      "name": "default-release-client",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "default-release-client"
+        },
+        {
+          "type": "build",
+          "name": "default-release-client"
+        }
+      ]
+    },
+    {
+      "name": "default-release-server",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "default-release-server"
+        },
+        {
+          "type": "build",
+          "name": "default-release-server"
+        }
+      ]
+    },
+    {
+      "name": "default-develop",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "default-develop"
+        },
+        {
+          "type": "build",
+          "name": "default-develop"
+        }
+      ]
+    },
+    {
+      "name": "default-documentation",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "default-develop"
+        },
+        {
+          "type": "build",
+          "name": "default-documentation"
+        }
+      ]
+    },
+    {
+      "name": "default-qmllint",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "default-develop"
+        },
+        {
+          "type": "build",
+          "name": "default-qmllint"
+        }
+      ]
+    },
+    {
+      "name": "default-develop-debug",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "default-develop-debug"
+        },
+        {
+          "type": "build",
+          "name": "default-develop-debug"
+        }
+      ]
+    }
+  ],
+  "packagePresets": [
+    {
+      "name": "default-release-all",
+      "description": "Release runtime components",
+      "configurePreset": "default-release-all",
+      "generators": [
+        "IFW",
+        "TGZ"
+      ],
+      "variables": {
+        "CPACK_PACKAGE_CONTACT": "estervtech@gmail.com",
+        "CPACK_PACKAGE_VENDOR": "estervtech"
+      },
+      "packageDirectory": "packages"
+    },
+    {
+      "name": "default-release-client",
+      "description": "Release Client",
+      "configurePreset": "default-release-client",
+      "generators": [
+        "IFW",
+        "TGZ"
+      ],
+      "variables": {
+        "CPACK_PACKAGE_CONTACT": "estervtech@gmail.com",
+        "CPACK_PACKAGE_VENDOR": "estervtech"
+      },
+      "packageDirectory": "packages"
+    },
+    {
+      "name": "default-develop",
+      "description": "Release development components",
+      "configurePreset": "default-develop",
+      "generators": [
+        "IFW",
+        "TGZ"
+      ],
+      "variables": {
+        "CPACK_COMPONENTS_GROUPING": "ALL_COMPONENTS_IN_ONE",
+        "CPACK_PACKAGE_CONTACT": "estervtech@gmail.com",
+        "CPACK_PACKAGE_VENDOR": "estervtech"
+      },
+      "packageDirectory": "packages-dev"
+    }
+  ]
+}
