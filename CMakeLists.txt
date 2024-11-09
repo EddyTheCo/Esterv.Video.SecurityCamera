@@ -73,4 +73,15 @@ if(BUILD_CLIENT)
     target_compile_definitions(client
                                PRIVATE FORCE_STYLE="Esterv.Controls.Flat")
   endif(EMSCRIPTEN OR ANDROID)
+  if(EMSCRIPTEN)
+    add_custom_command(
+      TARGET client
+      POST_BUILD
+      COMMAND
+        ${CMAKE_COMMAND} ARGS -E copy "${CMAKE_CURRENT_BINARY_DIR}/client.js"
+        "${CMAKE_CURRENT_BINARY_DIR}/client.wasm"
+        "${CMAKE_CURRENT_BINARY_DIR}/qtloader.js"
+        "${CMAKE_CURRENT_SOURCE_DIR}/wasm")
+  endif(EMSCRIPTEN)
+
 endif(BUILD_CLIENT)
