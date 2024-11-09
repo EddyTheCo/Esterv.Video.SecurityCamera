@@ -16,12 +16,11 @@ class Client : public QObject {
     QML_ELEMENT
 
 
-
-
     QTcpSocket *socket_;
     enum class ReadingState { Size, FrameData, DescriptionData };
     ReadingState read_state_{ReadingState::Size};
-    QByteArray received_data_;
+    QByteArray frame_array_;
+    QByteArray frame_size_array_;
     quint32 frame_size_;
     QString frame_src_;
     QString address_;
@@ -30,7 +29,7 @@ class Client : public QObject {
     void analyzeData();
     void gotFrame();
     void setFrameId();
-    void tryConnect();
+
     void onConnected();
     void onDisconnected();
 
@@ -47,6 +46,7 @@ public:
     ConState state(void){return conn_state_;}
     Client(QObject *parent = nullptr);
     Q_INVOKABLE void sendCommand(uint8_t command);
+    Q_INVOKABLE void tryConnect();
     QString getSource(void) const { return frame_src_; }
 signals:
     void stateChanged();

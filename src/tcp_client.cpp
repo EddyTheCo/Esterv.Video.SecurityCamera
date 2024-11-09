@@ -7,16 +7,21 @@ void Client::tryConnect()
 {
     if(port_>0u&&!address_.isEmpty())
     {
+        socket_->disconnectFromHost();
+        qDebug()<<"connectToHost";
         socket_->connectToHost(address_, port_);
     }
 }
 void Client::onConnected()
 {
+    qDebug()<<"Connected";
     conn_state_=Connected;
     emit stateChanged();
+    sendCommand(1);
 }
 void Client::onDisconnected()
 {
+    qDebug()<<"Disconnected";
     conn_state_=Disconnected;
     emit stateChanged();
 }
@@ -27,8 +32,6 @@ Client::Client(QObject *parent) : QObject(parent), socket_(new QTcpSocket(this))
     connect(socket_, &QTcpSocket::errorOccurred, this, [](QAbstractSocket::SocketError socketError) {
         qDebug() << "Connection failed with error:" << socketError;
     });
-    connect(this, &Client::addressChanged, this, &Client::tryConnect);
-    connect(this, &Client::portChanged, this, &Client::tryConnect);
 }
 void Client::sendCommand(uint8_t command)
 {
@@ -39,13 +42,17 @@ void Client::sendCommand(uint8_t command)
 }
 void Client::analyzeData() {
 
-        received_data_.append(socket_->readAll());
+    std::size_t pos{0};
+    const auto data=socket_->readAll();
+    const auto length=data.size();
+    while (pos < length) {
+
         switch (read_state_) {
         case ReadingState::Size:
-
-            if(received_data_.size()>=4)
+            frame_size_array_.push_back(data.at(pos));
+            if(frame_size_array_.size() == 4)
             {
-                auto buffer = QDataStream(&received_data_, QIODevice::ReadOnly);
+                auto buffer = QDataStream(&frame_size_array_, QIODevice::ReadOnly);
                 buffer.setByteOrder(QDataStream::BigEndian);
                 buffer >> frame_size_;
                 if(frame_size_<2147483648)
@@ -56,25 +63,30 @@ void Client::analyzeData() {
                 {
                     read_state_ = ReadingState::DescriptionData;
                 }
-
-                received_data_.remove(0, 4);
+                frame_size_array_.clear();
             }
+
+            ++pos;
             break;
         case ReadingState::FrameData:
-
-            if(received_data_.size()>=frame_size_)
-            {
+            const auto take_size =
+                std::min(frame_size_ - frame_array_.size(), static_cast<qsizetype>(length - pos));
+            std::move(data.begin() + pos, data.begin() + pos + take_size,
+                      std::back_inserter(frame_array_));
+            pos += take_size;
+            if (frame_array_.size() == frame_size_) {
                 gotFrame();
                 read_state_ = ReadingState::Size;
-                received_data_.remove(0, frame_size_);
+                frame_array_.clear();
             }
             break;
         }
+    }
 }
 
 void Client::gotFrame()
 {
-    std::vector<uint8_t> frame(received_data_.begin(), received_data_.begin()+frame_size_);
+    std::vector<uint8_t> frame(frame_array_.begin(), frame_array_.end());
     const auto grayMat= cv::imdecode(frame, cv::IMREAD_GRAYSCALE);
     WasmImageProvider::img = QImage(grayMat.data, grayMat.cols, grayMat.rows, grayMat.step, QImage::Format_Grayscale8);
     setFrameId();
