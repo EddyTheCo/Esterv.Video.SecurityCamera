@@ -23,11 +23,11 @@ endif(BUILD_SERVER)
 if(BUILD_CLIENT)
   include(InstallRequiredSystemLibraries)
   FetchContent_Declare(
-      EstervDesigns
-      GIT_REPOSITORY https://github.com/EddyTheCo/Esterv.Designs.git
-      GIT_TAG develop
-      FIND_PACKAGE_ARGS 2 COMPONENTS SimpleStyle FlatControl CONFIG)
-    FetchContent_MakeAvailable(EstervDesigns)
+    EstervDesigns
+    GIT_REPOSITORY https://github.com/EddyTheCo/Esterv.Designs.git
+    GIT_TAG develop
+    FIND_PACKAGE_ARGS 2 COMPONENTS SimpleStyle CustomControls FlatControl CONFIG)
+  FetchContent_MakeAvailable(EstervDesigns)
   if(EMSCRIPTEN OR ANDROID)
     find_package(Qt6 REQUIRED COMPONENTS QuickControls2)
   endif(EMSCRIPTEN OR ANDROID)
