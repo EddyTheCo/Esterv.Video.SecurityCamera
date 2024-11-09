@@ -26,7 +26,7 @@ ApplicationWindow {
     GridLayout
     {
         id:grid
-        property bool iscolumn:width < 750
+        property bool iscolumn:width < 800
 
         anchors.fill: parent
         flow: grid.iscolumn ? GridLayout.TopToBottom : GridLayout.LeftToRight
@@ -36,7 +36,7 @@ ApplicationWindow {
             id: player
             Layout.fillHeight: true
             Layout.fillWidth: true
-            Layout.minimumWidth: 400
+            Layout.minimumWidth: 600
             Layout.minimumHeight:  300
             Rectangle
             {
@@ -72,7 +72,7 @@ ApplicationWindow {
                     }
                     Rectangle
                     {
-                        Layout.minimumWidth: 10
+                        Layout.minimumWidth: 20
                         Layout.preferredHeight: width
                         radius: width*0.5
                         color: tcpclient.state ? "green" : "red"
@@ -97,16 +97,20 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.maximumWidth: 400
             Layout.maximumHeight:  250
+
             GridLayout
             {
                 anchors.fill: parent
+                anchors.margins: 10
                 columns: 2
-                flow: (width < 350) ? GridLayout.TopToBottom : GridLayout.LeftToRight
+                flow: (width < 300) ? GridLayout.TopToBottom : GridLayout.LeftToRight
                 Label {
                     text: qsTr("Server:")
+
                 }
                 TextField {
                     id: address
+                    Layout.fillWidth: true
                     text:"localhost"
                 }
                 Label {
@@ -116,6 +120,10 @@ ApplicationWindow {
                     id: port
                     validator: IntValidator { bottom: 1000; top: 1000000 }
                     text:"9999"
+                    Layout.maximumWidth: 70
+                }
+                Item {
+                    id: name
                 }
                 Button
                 {
