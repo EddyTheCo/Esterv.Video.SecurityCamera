@@ -1,3 +1,6 @@
 tags*
 build*
 CMakeLists.txt.user
+wasm/client.js
+wasm/client.wasm
+wasm/qtloader.js

@@ -42,8 +42,8 @@ ApplicationWindow {
             {
                 id:showIsConected
 
-                topRightRadius:Math.max(width,height)*0.5
-                bottomRightRadius:topRightRadius
+                //topRightRadius:Math.max(width,height)*0.5
+                //bottomRightRadius:topRightRadius
 
                 Layout.minimumHeight: 60
                 Layout.minimumWidth: 180

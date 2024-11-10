@@ -70,7 +70,7 @@ void Client::analyzeData() {
             break;
         case ReadingState::FrameData:
             const auto take_size =
-                std::min(frame_size_ - frame_array_.size(), static_cast<qsizetype>(length - pos));
+                std::min(static_cast<quint32>(frame_size_ - frame_array_.size()), static_cast<quint32>(length - pos));
             std::move(data.begin() + pos, data.begin() + pos + take_size,
                       std::back_inserter(frame_array_));
             pos += take_size;
