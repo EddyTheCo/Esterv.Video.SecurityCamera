@@ -10,8 +10,7 @@ uint32_t Session::index_{0};
 
 Session::Session(boost::asio::ip::tcp::tcp::socket socket)
     : web_socket_(std::move(socket)) {
-
-     web_socket_.binary(true);
+    web_socket_.binary(true);
 }
 
 void Session::start()
@@ -105,24 +104,43 @@ static std::array<uint8_t,4> serialize_uint32_t(uint32_t size)
                                 static_cast<uint8_t>((size >> 8) & 0xFF),
                                 static_cast<uint8_t>(size & 0xFF)};
 }
+void Session::doBuff()
+{
+    if(write_buf.size())
+    {
+    auto self(shared_from_this());
+    web_socket_.async_write(boost::asio::buffer(write_buf, write_buf.size()),[this, self](boost::system::error_code ec, std::size_t length) {
+        if (ec) {
+            BOOST_LOG_TRIVIAL(error)
+            << __PRETTY_FUNCTION__ << " " << ec.message();
+            web_socket_.async_close(boost::beast::websocket::close_code::normal,[](boost::beast::error_code ec){});
+            sessions_.extract(id_);
+        }
+        else
+        {
+            write_buf.erase(write_buf.begin(), write_buf.begin() + length);
+            doBuff();
+            is_writing_=false;
+        }
+    });
+    is_writing_=true;
+    }
+}
 void Session::doWrite(const std::vector<uint8_t> &packet_data) {
 
     BOOST_LOG_TRIVIAL(debug)
         << __PRETTY_FUNCTION__ <<packet_data.size();
-    const auto size=serialize_uint32_t(packet_data.size());
-    std::vector<uint8_t> buf{size.cbegin(),size.cend()};
-    buf.insert(buf.end(), packet_data.begin(), packet_data.end());
 
-    //std::array<uint8_t,100> buf{3};
-    auto self(shared_from_this());
-    web_socket_.async_write(boost::asio::buffer(buf, buf.size()),[this, self](boost::system::error_code ec, std::size_t length) {
-        if (ec) {
-            BOOST_LOG_TRIVIAL(error)
-                <<"Maria"<< __PRETTY_FUNCTION__ << " " << ec.message();
-            web_socket_.async_close(boost::beast::websocket::close_code::normal,[](boost::beast::error_code ec){});
-            sessions_.extract(id_);
-        }
-    });
+
+    const auto size=serialize_uint32_t(packet_data.size());
+    write_buf.insert(write_buf.end(),size.cbegin(),size.cend());
+    write_buf.insert(write_buf.end(), packet_data.cbegin(), packet_data.cend());
+
+    if(!is_writing_)
+    {
+        doBuff();
+    }
+
 }
 
 Server::Server(boost::asio::io_context &io_context, unsigned short port)

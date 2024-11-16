@@ -6,12 +6,15 @@
 class Session : public std::enable_shared_from_this<Session> {
     explicit Session(boost::asio::ip::tcp::tcp::socket socket);
     void doWrite(const std::vector<uint8_t> &packet_data);
+    void doBuff();
     void doRead();
     void execute();
     void stream();
     void start();
+    bool is_writing_{false};
     boost::beast::websocket::stream<boost::asio::ip::tcp::tcp::socket> web_socket_;
     boost::beast::flat_buffer read_buffer_;
+    std::vector<uint8_t> write_buf;
     uint8_t command_{0};
     uint32_t id_{0};
     uint32_t frame_index_{0};
