@@ -1,5 +1,6 @@
 #pragma once
 #include <boost/asio.hpp>
+#include <boost/beast/websocket.hpp>
 #include <unordered_map>
 
 class Session : public std::enable_shared_from_this<Session> {
@@ -8,7 +9,9 @@ class Session : public std::enable_shared_from_this<Session> {
     void doRead();
     void execute();
     void stream();
-    boost::asio::ip::tcp::tcp::socket socket_;
+    void start();
+    boost::beast::websocket::stream<boost::asio::ip::tcp::tcp::socket> web_socket_;
+    boost::beast::flat_buffer read_buffer_;
     uint8_t command_{0};
     uint32_t id_{0};
     uint32_t frame_index_{0};

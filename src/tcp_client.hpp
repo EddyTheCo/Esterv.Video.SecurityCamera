@@ -2,31 +2,27 @@
 
 
 #include <cstdint>
-#include <string>
 #include <QObject>
-#include <QTcpSocket>
+#include <QWebSocket>
 #include <qquickimageprovider.h>
 
 class Client : public QObject {
     Q_OBJECT
-    Q_PROPERTY(QString address MEMBER address_ NOTIFY addressChanged)
-    Q_PROPERTY(quint16 port MEMBER port_ NOTIFY portChanged)
+    Q_PROPERTY(QUrl address MEMBER address_ NOTIFY addressChanged)
     Q_PROPERTY(ConState  state READ state NOTIFY stateChanged)
     Q_PROPERTY(QString frameSource READ getSource NOTIFY sourceChanged)
     QML_ELEMENT
 
 
-    QTcpSocket *socket_;
+    QWebSocket* socket_;
     enum class ReadingState { Size, FrameData, DescriptionData };
     ReadingState read_state_{ReadingState::Size};
     QByteArray frame_array_;
     QByteArray frame_size_array_;
     quint32 frame_size_;
     QString frame_src_;
-    QString address_;
-    quint16 port_{0};
 
-    void analyzeData();
+    void analyzeData(const QByteArray &message);
     void gotFrame();
     void setFrameId();
 
@@ -34,8 +30,7 @@ class Client : public QObject {
     void onDisconnected();
 
 
-    std::string server_ip_;
-    uint32_t server_port_;
+    QUrl address_;
 
 public:
     enum ConState {

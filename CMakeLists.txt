@@ -100,12 +100,12 @@ if(BUILD_CLIENT)
     if(EMSCRIPTEN OR ANDROID)
       find_package(Qt6 REQUIRED COMPONENTS QuickControls2)
     endif(EMSCRIPTEN OR ANDROID)
-    find_package(Qt6 REQUIRED COMPONENTS Core Network Gui Quick)
+    find_package(Qt6 REQUIRED COMPONENTS Core WebSockets Gui Quick)
     qt_standard_project_setup()
     qt_add_executable(client src/client.cpp src/tcp_client.hpp src/tcp_client.cpp)
     target_include_directories(client PRIVATE src)
     target_link_libraries(
-      client PRIVATE ${OpenCV_LIBS} Qt6::Core Qt6::Network Qt6::Gui Qt6::Quick
+      client PRIVATE ${OpenCV_LIBS} Qt6::Core Qt6::WebSockets Qt6::Gui Qt6::Quick
                      Esterv::SimpleStyle)
     set_target_properties(client PROPERTIES WIN32_EXECUTABLE ON MACOSX_BUNDLE
                                                                 ON)

@@ -5,11 +5,11 @@
 
 void Client::tryConnect()
 {
-    if(port_>0u&&!address_.isEmpty())
+    if(!address_.isEmpty())
     {
-        socket_->disconnectFromHost();
+        socket_->close();
         qDebug()<<"connectToHost";
-        socket_->connectToHost(address_, port_);
+        socket_->open(address_);
     }
 }
 void Client::onConnected()
@@ -25,25 +25,25 @@ void Client::onDisconnected()
     conn_state_=Disconnected;
     emit stateChanged();
 }
-Client::Client(QObject *parent) : QObject(parent), socket_(new QTcpSocket(this)) {
-    connect(socket_, &QTcpSocket::connected, this, &Client::onConnected);
-    connect(socket_, &QTcpSocket::readyRead, this, &Client::analyzeData);
-    connect(socket_, &QTcpSocket::disconnected, this, &Client::onDisconnected);
-    connect(socket_, &QTcpSocket::errorOccurred, this, [](QAbstractSocket::SocketError socketError) {
+Client::Client(QObject *parent) : QObject(parent), socket_(new QWebSocket()) {
+    connect(socket_, &QWebSocket::connected, this, &Client::onConnected);
+    connect(socket_, &QWebSocket::binaryFrameReceived, this, &Client::analyzeData);
+    connect(socket_, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::errorOccurred),
+            this, [this](QAbstractSocket::SocketError socketError) {
         qDebug() << "Connection failed with error:" << socketError;
+        onDisconnected();
     });
 }
 void Client::sendCommand(uint8_t command)
 {
     QByteArray data;
     data.push_back(command);
-    socket_->write(data);
-    socket_->flush();
+    socket_->sendBinaryMessage(data);
 }
-void Client::analyzeData() {
+void Client::analyzeData(const QByteArray& data) {
 
+    qDebug()<<__PRETTY_FUNCTION__<<data.size();
     std::size_t pos{0};
-    const auto data=socket_->readAll();
     const auto length=data.size();
     while (pos < length) {
 
@@ -82,6 +82,7 @@ void Client::analyzeData() {
             break;
         }
     }
+
 }
 
 void Client::gotFrame()
