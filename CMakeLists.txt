@@ -155,6 +155,24 @@ if(BUILD_CLIENT)
     target_compile_definitions(client
                                PRIVATE FORCE_STYLE="Esterv.Controls.Flat")
   endif(EMSCRIPTEN OR ANDROID)
+  if(ANDROID)
+	set_property(TARGET client PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
+	set_property(TARGET client APPEND PROPERTY QT_ANDROID_MIN_SDK_VERSION 30)
+	set_property(TARGET client APPEND PROPERTY QT_ANDROID_TARGET_SDK_VERSION 34)
+	set_property(TARGET client APPEND PROPERTY QT_ANDROID_SDK_BUILD_TOOLS_REVISION 34.0.0)
+
+	FetchContent_Declare(
+		android_openssl
+		DOWNLOAD_EXTRACT_TIMESTAMP true
+		URL      https://github.com/KDAB/android_openssl/archive/refs/heads/master.zip
+		)
+	FetchContent_GetProperties(android_openssl)
+	if(NOT android_openssl_POPULATED)
+		FetchContent_Populate(android_openssl)
+		include(${android_openssl_SOURCE_DIR}/android_openssl.cmake)
+		add_android_openssl_libraries(client)
+	endif(NOT android_openssl_POPULATED)
+endif(ANDROID)
   if(EMSCRIPTEN)
     add_custom_command(
       TARGET client
