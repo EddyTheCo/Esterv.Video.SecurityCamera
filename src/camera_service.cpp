@@ -38,16 +38,16 @@ void CameraService::startMotionDetection()
         while (true) {
             cap >> frame;
             cv::cvtColor(frame, gray_frame, cv::COLOR_BGR2GRAY);
-            bgSubtractor->apply(frame, fgMask);
+            //bgSubtractor->apply(frame, fgMask);
 
-            const int nonZeroPixels = cv::countNonZero(fgMask);
-            const int totalPixels = frame.rows * frame.cols;
+            //const int nonZeroPixels = cv::countNonZero(fgMask);
+            //const int totalPixels = frame.rows * frame.cols;
 
-            const double changePercentage = (nonZeroPixels * 100.0) / totalPixels;
+            //const double changePercentage = (nonZeroPixels * 100.0) / totalPixels;
 
-            const std::string output_name = "output" + std::to_string(recording_index) + ".mp4";
+            //const std::string output_name = "output" + std::to_string(recording_index) + ".mp4";
 
-            if (changePercentage > 10) {
+            /*if (changePercentage > 10) {
                 std::cout << "Significant change detected: " << changePercentage << "% of pixels changed." << std::endl;
                 startTime = std::chrono::steady_clock::now();
                 if (!is_recording) {
@@ -57,7 +57,7 @@ void CameraService::startMotionDetection()
                     }
                 }
                 is_recording = true;
-            }
+            }*/
             auto currentTime = std::chrono::steady_clock::now();
 
             if (is_recording) {
