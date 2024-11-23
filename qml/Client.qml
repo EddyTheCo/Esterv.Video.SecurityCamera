@@ -12,34 +12,31 @@ ApplicationWindow {
         color: Style.backColor1
     }
 
-    Client{
-        id:tcpclient
-        address:address.text
+    Client {
+        id: tcpclient
+        address: address.text
     }
-    ThemeSwitch
-    {
+    ThemeSwitch {
         anchors.right: parent.right
         anchors.top: parent.top
     }
 
-    GridLayout
-    {
-        id:grid
-        property bool iscolumn:width < 800
+    GridLayout {
+        id: grid
+        property bool iscolumn: width < 800
 
         anchors.fill: parent
         flow: grid.iscolumn ? GridLayout.TopToBottom : GridLayout.LeftToRight
-        columns:2
+        columns: 2
 
         ColumnLayout {
             id: player
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.minimumWidth: 600
-            Layout.minimumHeight:  300
-            Rectangle
-            {
-                id:showIsConected
+            Layout.minimumHeight: 300
+            Rectangle {
+                id: showIsConected
 
                 //topRightRadius:Math.max(width,height)*0.5
                 //bottomRightRadius:topRightRadius
@@ -49,76 +46,65 @@ ApplicationWindow {
 
                 color: Style.backColor2
 
-                MouseArea
-                {
+                MouseArea {
                     anchors.fill: showIsConected
                     hoverEnabled: true
                     ToolTip.text: connectedLabel.text
                     ToolTip.visible: containsMouse
                 }
 
-
-
-                RowLayout
-                {
+                RowLayout {
                     anchors.fill: showIsConected
-                    Label
-                    {
-                        id:connectedLabel
+                    Label {
+                        id: connectedLabel
 
-                        text:qsTr(tcpclient.state?"Connected":"Not Connected")
-                        elide:Text.ElideRight
+                        text: qsTr(tcpclient.state ? "Connected" : "Not Connected")
+                        elide: Text.ElideRight
                     }
-                    Rectangle
-                    {
+                    Rectangle {
                         Layout.minimumWidth: 20
                         Layout.preferredHeight: width
-                        radius: width*0.5
+                        radius: width * 0.5
                         color: tcpclient.state ? "green" : "red"
                     }
                 }
-
             }
             Image {
+                id: framedisplay
                 Layout.fillHeight: true
                 Layout.fillWidth: true
-                id: framedisplay
                 cache: false
                 source: "image://wasm/" + tcpclient.frameSource
                 fillMode: Image.PreserveAspectFit
             }
         }
-        Frame
-        {
-            id:serverConf
+        Frame {
+            id: serverConf
             Layout.alignment: Qt.AlignCenter
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.maximumWidth: 400
-            Layout.maximumHeight:  250
+            Layout.maximumHeight: 250
 
-            GridLayout
-            {
+            GridLayout {
                 anchors.fill: parent
                 anchors.margins: 10
                 columns: 2
                 flow: (width < 300) ? GridLayout.TopToBottom : GridLayout.LeftToRight
                 Label {
                     text: qsTr("Server:")
-
                 }
                 TextField {
                     id: address
                     Layout.fillWidth: true
-                    text:"ws://localhost:9999"
+                    text: "ws://localhost:9999"
                 }
                 Item {
                     id: name
                 }
-                Button
-                {
-                    text:qsTr("Connect")
-                    onClicked: tcpclient.tryConnect();
+                Button {
+                    text: qsTr("Connect")
+                    onClicked: tcpclient.tryConnect()
                     Layout.alignment: Qt.AlignRight
                 }
             }
