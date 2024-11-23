@@ -7,20 +7,17 @@ void Client::tryConnect()
     if(!address_.isEmpty())
     {
         socket_->close();
-        qDebug()<<"connectToHost";
         socket_->open(address_);
     }
 }
 void Client::onConnected()
 {
-    qDebug()<<"Connected";
     conn_state_=Connected;
     emit stateChanged();
     sendCommand(1);
 }
 void Client::onDisconnected()
 {
-    qDebug()<<"Disconnected";
     conn_state_=Disconnected;
     emit stateChanged();
 }
@@ -41,7 +38,6 @@ void Client::sendCommand(uint8_t command)
 }
 void Client::analyzeData(const QByteArray& data) {
 
-    qDebug()<<__PRETTY_FUNCTION__<<data.size();
     std::size_t pos{0};
     const auto length=data.size();
     while (pos < length) {

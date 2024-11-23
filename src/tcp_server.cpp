@@ -22,9 +22,6 @@ void Session::start()
     });
 }
 void Session::doRead() {
-
-    BOOST_LOG_TRIVIAL(debug)
-    << __PRETTY_FUNCTION__ ;
     auto self(shared_from_this());
     sessions_.insert({index_, self});
     id_=index_;
@@ -32,8 +29,6 @@ void Session::doRead() {
     web_socket_.async_read(
         read_buffer_,
         [self](boost::system::error_code ec, std::size_t length) {
-            BOOST_LOG_TRIVIAL(debug)
-                << "async_read_some:"<<length;
             if (!ec) {
                 self->execute();
                 self->doRead();
@@ -79,14 +74,10 @@ void Session::sendFrame(const std::vector<uint8_t> &frame, const uint8_t command
 
 void Session::execute()
 {
-    BOOST_LOG_TRIVIAL(debug)
-    << __PRETTY_FUNCTION__ << " read_buffer_.size:" << read_buffer_.size();
     if (read_buffer_.size()) {
         const auto* data = static_cast<const uint8_t*>(read_buffer_.data().data());
         command_ = *data;
         read_buffer_.consume(read_buffer_.size());
-        BOOST_LOG_TRIVIAL(debug)
-            << __PRETTY_FUNCTION__ << " command:" << (int)command_;
         if(command_>1)
         {
             CameraService::streamRecording(command_,id_);
@@ -97,8 +88,6 @@ void Session::execute()
 }
 static std::array<uint8_t,4> serialize_uint32_t(uint32_t size)
 {
-    BOOST_LOG_TRIVIAL(debug)
-    << __PRETTY_FUNCTION__ << " " << size;
     return std::array<uint8_t,4>{static_cast<uint8_t>((size >> 24) & 0xFF),
                                 static_cast<uint8_t>((size >> 16) & 0xFF),
                                 static_cast<uint8_t>((size >> 8) & 0xFF),
@@ -127,10 +116,6 @@ void Session::doBuff()
     }
 }
 void Session::doWrite(const std::vector<uint8_t> &packet_data) {
-
-    BOOST_LOG_TRIVIAL(debug)
-        << __PRETTY_FUNCTION__ <<packet_data.size();
-
 
     const auto size=serialize_uint32_t(packet_data.size());
     write_buf.insert(write_buf.end(),size.cbegin(),size.cend());

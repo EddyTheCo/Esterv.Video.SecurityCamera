@@ -6,8 +6,7 @@ option(BUILD_CLIENT "Build Client part" ON)
 option(BUILD_SERVER "Build Server part" ON)
 option(BUILD_DOCS "Build Documentation part" OFF)
 option(QTDEPLOY "Deploy Qt libraries" OFF)
-
-include(FetchContent)
+option(MOTION_DETECTION "Add motion detection and save videos on the server" OFF)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -41,6 +40,10 @@ if(BUILD_SERVER
                         src/camera_service.hpp src/camera_service.cpp)
   target_link_libraries(server PRIVATE ${OpenCV_LIBS} Boost::system Boost::log)
 
+  if(MOTION_DETECTION)
+      target_compile_definitions(server
+	                         PRIVATE MOTION_DETECTION)
+  endif(MOTION_DETECTION)
   set_property(TARGET server PROPERTY CXX_STANDARD 17)
   install(TARGETS server COMPONENT server)
 endif(
@@ -77,7 +80,7 @@ if(BUILD_CLIENT)
       GIT_REPOSITORY https://github.com/qt/qtwebsockets.git
       GIT_TAG 6.6.0)
     FetchContent_MakeAvailable(qtwebsockets)
-  endif()
+  endif(NOT TARGET Qt6::WebSockets)
 
   qt_add_executable(client src/client.cpp src/tcp_client.hpp src/tcp_client.cpp)
   target_include_directories(client PRIVATE src)
