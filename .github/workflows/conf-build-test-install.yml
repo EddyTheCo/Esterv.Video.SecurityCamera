@@ -18,7 +18,6 @@ jobs:
       os: ${{ matrix.os }}
       qtModules: 'qtwebsockets qtshadertools'
       qtVersion: '6.6.0'
-      test: false
   build-android:
     strategy:
       matrix:
