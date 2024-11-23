@@ -35,7 +35,40 @@ if(BUILD_SERVER
   find_package(
     OpenCV
     COMPONENTS core imgproc videoio video
-    REQUIRED)
+    )
+
+  if(NOT OpenCV_FOUND)
+	set(builturl "https://github.com/EddyTheCo/install-OpenCV-action/releases/latest/download/OpenCV-ubuntu-latest-wasm_false-android_none.tar")
+	if(WIN32)
+		set(builturl "https://github.com/EddyTheCo/install-OpenCV-action/releases/latest/download/OpenCV-windows-latest-wasm_false-android_none.tar")
+	endif(WIN32)
+	if (APPLE)
+		set(builturl "https://github.com/EddyTheCo/install-OpenCV-action/releases/latest/download/OpenCV-macos-latest-wasm_false-android_none.tar")
+	endif(APPLE)
+	FetchContent_Declare(
+		OpenCV
+		DOWNLOAD_EXTRACT_TIMESTAMP true
+		URL  ${builturl}
+		)
+	FetchContent_GetProperties(OpenCV)
+	if(NOT OpenCV_POPULATED)
+		message(STATUS "OpenCV prebuilt will be downloaded from ${builturl} if not found on the system")
+		FetchContent_Populate(OpenCV)
+		message(STATUS "OpenCV is installed in ${opencv_SOURCE_DIR}")
+		set(OpenCV_DIR ${opencv_SOURCE_DIR}/lib/cmake/opencv4)
+		if(WIN32)
+			set(OpenCV_DIR ${opencv_SOURCE_DIR})
+		endif(WIN32)
+		find_package(OpenCV COMPONENTS core imgproc videoio video)
+	endif()
+	if(OpenCV_FOUND AND NOT ANDROID AND NOT EMSCRIPTEN)
+		install(IMPORTED_RUNTIME_ARTIFACTS ${OpenCV_LIBS}
+			DESTINATION ${CMAKE_INSTALL_LIBDIR}
+			COMPONENT server
+			)
+	endif(OpenCV_FOUND AND NOT ANDROID AND NOT EMSCRIPTEN)
+endif()
+
   find_package(Boost REQUIRED COMPONENTS system log)
   add_executable(server src/server.cpp src/tcp_server.cpp src/tcp_server.hpp
                         src/camera_service.hpp src/camera_service.cpp)
