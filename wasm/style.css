@@ -1,0 +1,142 @@
+html,body{
+	height:100%;
+	width:100%;
+	float:left;
+	background-color: #10141c;
+	min-height: 100%;
+	color: white;
+	font-family: 'Titillium Web';
+	font-size: 2vw;
+	margin: 0;
+	padding:0;
+
+}
+a{
+	text-decoration: underline;
+	color: hotpink;
+}
+.pair {
+	width:100%;
+	height:100%;
+	float: left;
+	background-color: #10141c;
+	color: white;
+}
+#qtspinner
+{
+	position:fixed;
+	width:50%;
+	height:50%;
+	bottom: 25%;
+	right: 25%;
+	display:block;
+	z-index: 1000
+}
+#codeArea {
+	padding:1%;
+	visibility: collapse;
+}
+#editor {
+}
+.qtscreen { width: 100%; height: 100%; }
+figure
+{
+	width:100%;
+	height:100%;
+}
+img
+{
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	width: 50%;
+	max-height: 70%;
+}
+center
+{
+	float: left;
+	width: 100%;
+	height: 100%;
+}
+footer
+{
+	display: none;
+	background-color: #10141c;
+	font-size: 2vw;
+}
+.fcont
+{
+	margin-top: 1%;
+	margin-left: 1%;
+	width:99%;
+	height:99%;
+	display:flex;
+	justify-content: space-between;
+	align-items: stretch;
+	flex-direction: column;
+}
+.splitter {
+	display: flex;
+}
+
+.splitter > .gutter {
+	background-color: #10141c;
+	border: 0px;
+	visibility: hidden;
+}
+
+.splitter > .gutter::before {
+	background-color: #0f79af;
+}
+@media screen and (min-width: 700px) {
+
+	#codeArea {
+		width: 70%;
+		height: 100%;
+		visibility: visible;
+	}
+	footer
+	{
+		height:10%;
+		width:100%;
+		font-size: 1vw;
+		position: absolute;
+		top: 100%;
+		display: inherit;
+	}
+	.fcont
+	{
+		margin-top: 1%;
+		margin-left: 1%;
+		flex-direction: row;
+	}
+	#editor {
+		width: 100%;
+		height: 100%;
+		font-family: 'Ubuntu Condensed';
+		font-size: 1.3vw;
+		overflow-y:scroll;
+	}
+
+	.splitter > .gutter {
+		visibility: visible;
+	}
+
+}
+code {
+	font-family: MyFancyCustomFont, monospace;
+	font-size: 0.9vw;
+	color: #5caea3
+}
+
+/* Code in text */
+p > code,
+li > code,
+dd > code,
+td > code {
+	background: #ffeff0;
+	word-wrap: break-word;
+	box-decoration-break: clone;
+	padding: .1rem .3rem .2rem;
+	border-radius: .2rem;
+}
