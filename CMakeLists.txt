@@ -6,7 +6,8 @@ option(BUILD_CLIENT "Build Client part" ON)
 option(BUILD_SERVER "Build Server part" ON)
 option(BUILD_DOCS "Build Documentation part" OFF)
 option(QTDEPLOY "Deploy Qt libraries" OFF)
-option(MOTION_DETECTION "Add motion detection and save videos on the server" OFF)
+option(MOTION_DETECTION "Add motion detection and save videos on the server"
+       OFF)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -41,8 +42,7 @@ if(BUILD_SERVER
   target_link_libraries(server PRIVATE ${OpenCV_LIBS} Boost::system Boost::log)
 
   if(MOTION_DETECTION)
-      target_compile_definitions(server
-	                         PRIVATE MOTION_DETECTION)
+    target_compile_definitions(server PRIVATE MOTION_DETECTION)
   endif(MOTION_DETECTION)
   set_property(TARGET server PROPERTY CXX_STANDARD 17)
   install(TARGETS server COMPONENT server)
