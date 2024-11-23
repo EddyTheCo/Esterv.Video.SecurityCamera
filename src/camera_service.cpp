@@ -21,23 +21,24 @@ void CameraService::startMotionDetection()
     }
     else
     {
-        cv::Mat frame,gray_frame, fgMask;
+        cv::Mat frame,gray_frame;
 
-        int frame_width = static_cast<int>(cap.get(cv::CAP_PROP_FRAME_WIDTH));
-        int frame_height = static_cast<int>(cap.get(cv::CAP_PROP_FRAME_HEIGHT));
-
-        std::cout << "Frame size: " << frame_width << "x" << frame_height << std::endl;
-
+#ifdef MOTION_DETECTION
+        cv::Mat fgMask;
+        const int frame_width = static_cast<int>(cap.get(cv::CAP_PROP_FRAME_WIDTH));
+        const int frame_height = static_cast<int>(cap.get(cv::CAP_PROP_FRAME_HEIGHT));
         cv::Ptr<cv::BackgroundSubtractor> bgSubtractor = cv::createBackgroundSubtractorMOG2();
-
         int fourcc = cv::VideoWriter::fourcc('M', 'P', '4', 'V');
         cv::VideoWriter writer;
-
         auto startTime = std::chrono::steady_clock::now();
         bool is_recording{false};
+#endif
+
         while (true) {
             cap >> frame;
             cv::cvtColor(frame, gray_frame, cv::COLOR_BGR2GRAY);
+
+#ifdef MOTION_DETECTION
             bgSubtractor->apply(frame, fgMask);
 
             const int nonZeroPixels = cv::countNonZero(fgMask);
@@ -48,7 +49,6 @@ void CameraService::startMotionDetection()
             const std::string output_name = "output" + std::to_string(recording_index) + ".mp4";
 
             if (changePercentage > 10) {
-                std::cout << "Significant change detected: " << changePercentage << "% of pixels changed." << std::endl;
                 startTime = std::chrono::steady_clock::now();
                 if (!is_recording) {
                     writer.open(output_name, fourcc, 30.0, cv::Size(frame_width, frame_height),false);
@@ -61,8 +61,6 @@ void CameraService::startMotionDetection()
             auto currentTime = std::chrono::steady_clock::now();
 
             if (is_recording) {
-
-
                 std::time_t now = std::time(nullptr);  // Get current time in seconds
                 char timestamp[100];
                 std::strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", std::localtime(&now));
@@ -82,9 +80,9 @@ void CameraService::startMotionDetection()
                     recording_index++;
                 }
             }
+#endif
             std::vector<uint8_t> buffer;
             cv::imencode(".jpg", gray_frame, buffer);
-
             Session::sendFrame(buffer);
         }
 
