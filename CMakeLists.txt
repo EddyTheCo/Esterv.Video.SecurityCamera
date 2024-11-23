@@ -51,111 +51,84 @@ endif(
 if(BUILD_CLIENT)
   include(InstallRequiredSystemLibraries)
 
-  find_package(OpenCV COMPONENTS core imgcodecs)
-
-  if(NOT OpenCV_FOUND)
-    if(EMSCRIPTEN)
-      set(builturl
-          "https://github.com/EddyTheCo/install-OpenCV-action/releases/latest/download/OpenCV-ubuntu-latest-wasm_true-android_none.tar"
-      )
-    endif(EMSCRIPTEN)
-    if(ANDROID)
-      set(builturl
-          "https://github.com/EddyTheCo/install-OpenCV-action/releases/latest/download/OpenCV-ubuntu-latest-wasm_false-android_${ANDROID_ABI}.tar"
-      )
-    endif(ANDROID)
+  FetchContent_Declare(
+    EstervDesigns
+    GIT_REPOSITORY https://github.com/EddyTheCo/Esterv.Designs.git
+    GIT_TAG develop
+    FIND_PACKAGE_ARGS
+    2
+    COMPONENTS
+    SimpleStyle
+    CustomControls
+    FlatControl
+    CONFIG)
+  FetchContent_MakeAvailable(EstervDesigns)
+  if(EMSCRIPTEN OR ANDROID)
+    find_package(Qt6 REQUIRED COMPONENTS QuickControls2)
+  endif(EMSCRIPTEN OR ANDROID)
+  find_package(
+    Qt6 REQUIRED
+    COMPONENTS Core Gui Quick
+    OPTIONAL_COMPONENTS WebSockets)
+  qt_standard_project_setup()
+  if(NOT TARGET Qt6::WebSockets)
     FetchContent_Declare(
-      OpenCV
-      DOWNLOAD_EXTRACT_TIMESTAMP true
-      URL ${builturl})
-    FetchContent_GetProperties(OpenCV)
-    if(NOT OpenCV_POPULATED)
-      message(
-        STATUS
-          "OpenCV prebuilt will be downloaded from ${builturl} if not found on the system"
-      )
-      FetchContent_Populate(OpenCV)
-      message(STATUS "OpenCV is installed in ${opencv_SOURCE_DIR}")
-      set(OpenCV_DIR ${opencv_SOURCE_DIR}/lib/cmake/opencv4)
-      if(ANDROID)
-        set(OpenCV_DIR ${opencv_SOURCE_DIR}/sdk/native/jni)
-      endif(ANDROID)
-      find_package(OpenCV COMPONENTS core imgcodecs)
-    endif()
+      qtwebsockets
+      GIT_REPOSITORY https://github.com/qt/qtwebsockets.git
+      GIT_TAG 6.6.0)
+    FetchContent_MakeAvailable(qtwebsockets)
   endif()
 
-  if(OpenCV_FOUND)
-    FetchContent_Declare(
-      EstervDesigns
-      GIT_REPOSITORY https://github.com/EddyTheCo/Esterv.Designs.git
-      GIT_TAG develop
-      FIND_PACKAGE_ARGS
-      2
-      COMPONENTS
-      SimpleStyle
-      CustomControls
-      FlatControl
-      CONFIG)
-    FetchContent_MakeAvailable(EstervDesigns)
-    if(EMSCRIPTEN OR ANDROID)
-      find_package(Qt6 REQUIRED COMPONENTS QuickControls2)
-    endif(EMSCRIPTEN OR ANDROID)
-    find_package(Qt6 REQUIRED COMPONENTS Core WebSockets Gui Quick)
-    qt_standard_project_setup()
-    qt_add_executable(client src/client.cpp src/tcp_client.hpp src/tcp_client.cpp)
-    target_include_directories(client PRIVATE src)
+  qt_add_executable(client src/client.cpp src/tcp_client.hpp src/tcp_client.cpp)
+  target_include_directories(client PRIVATE src)
+  target_link_libraries(client PRIVATE ${OpenCV_LIBS} Qt6::Core Qt6::WebSockets
+                                       Qt6::Gui Qt6::Quick Esterv::SimpleStyle)
+  set_target_properties(client PROPERTIES WIN32_EXECUTABLE ON MACOSX_BUNDLE ON)
+
+  qt6_add_qml_module(
+    client
+    URI
+    SecurityCamera
+    VERSION
+    1.0
+    QML_FILES
+    "qml/Client.qml"
+    RESOURCE_PREFIX
+    "/esterVtech.com/imports"
+    IMPORT_PATH
+    ${CMAKE_BINARY_DIR})
+
+  install(
+    TARGETS client
+    COMPONENT Client
+    BUNDLE DESTINATION . COMPONENT Client
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Client)
+  if(QTDEPLOY)
+    qt_generate_deploy_qml_app_script(TARGET client OUTPUT_SCRIPT deploy_script)
+    install(SCRIPT ${deploy_script} COMPONENT Client)
+  endif(QTDEPLOY)
+
+  if(EMSCRIPTEN OR ANDROID)
     target_link_libraries(
-      client PRIVATE ${OpenCV_LIBS} Qt6::Core Qt6::WebSockets Qt6::Gui Qt6::Quick
-                     Esterv::SimpleStyle)
-    set_target_properties(client PROPERTIES WIN32_EXECUTABLE ON MACOSX_BUNDLE
-                                                                ON)
-
-    qt6_add_qml_module(
       client
-      URI
-      SecurityCamera
-      VERSION
-      1.0
-      QML_FILES
-      "qml/Client.qml"
-      RESOURCE_PREFIX
-      "/esterVtech.com/imports"
-      IMPORT_PATH
-      ${CMAKE_BINARY_DIR})
-
-    install(
-      TARGETS client
-      COMPONENT Client
-      BUNDLE DESTINATION . COMPONENT Client
-      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Client)
-    if(QTDEPLOY)
-      qt_generate_deploy_qml_app_script(TARGET client OUTPUT_SCRIPT
-                                        deploy_script)
-      install(SCRIPT ${deploy_script} COMPONENT Client)
-    endif(QTDEPLOY)
-
-    if(EMSCRIPTEN OR ANDROID)
-      target_link_libraries(
-        client
-        PRIVATE
-          Esterv::FlatControl
-          Qt6::QuickControls2
-          $<$<STREQUAL:$<TARGET_PROPERTY:Esterv::FlatControl,TYPE>,STATIC_LIBRARY>:Esterv::FlatControlplugin>
-      )
-      target_compile_definitions(client
-                                 PRIVATE FORCE_STYLE="Esterv.Controls.Flat")
-    endif(EMSCRIPTEN OR ANDROID)
-    if(EMSCRIPTEN)
-      add_custom_command(
-        TARGET client
-        POST_BUILD
-        COMMAND
-          ${CMAKE_COMMAND} ARGS -E copy "${CMAKE_CURRENT_BINARY_DIR}/client.js"
-          "${CMAKE_CURRENT_BINARY_DIR}/client.wasm"
-          "${CMAKE_CURRENT_BINARY_DIR}/qtloader.js"
-          "${CMAKE_CURRENT_SOURCE_DIR}/wasm")
-    endif(EMSCRIPTEN)
-  endif(OpenCV_FOUND)
+      PRIVATE
+        Esterv::FlatControl
+        Qt6::QuickControls2
+        $<$<STREQUAL:$<TARGET_PROPERTY:Esterv::FlatControl,TYPE>,STATIC_LIBRARY>:Esterv::FlatControlplugin>
+    )
+    target_compile_definitions(client
+                               PRIVATE FORCE_STYLE="Esterv.Controls.Flat")
+  endif(EMSCRIPTEN OR ANDROID)
+  if(EMSCRIPTEN)
+    add_custom_command(
+      TARGET client
+      POST_BUILD
+      COMMAND
+        ${CMAKE_COMMAND} ARGS -E copy "${CMAKE_CURRENT_BINARY_DIR}/client.js"
+        "${CMAKE_CURRENT_BINARY_DIR}/client.wasm"
+        "${CMAKE_CURRENT_BINARY_DIR}/qtloader.js"
+        "${CMAKE_CURRENT_SOURCE_DIR}/wasm")
+  endif(EMSCRIPTEN)
 endif(BUILD_CLIENT)
 
 build_cpack()

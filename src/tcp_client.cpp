@@ -1,4 +1,3 @@
-#include <opencv2/opencv.hpp>
 #include "tcp_client.hpp"
 #include <QImage>
 
@@ -27,7 +26,7 @@ void Client::onDisconnected()
 }
 Client::Client(QObject *parent) : QObject(parent), socket_(new QWebSocket()) {
     connect(socket_, &QWebSocket::connected, this, &Client::onConnected);
-    connect(socket_, &QWebSocket::binaryFrameReceived, this, &Client::analyzeData);
+    connect(socket_, &QWebSocket::binaryMessageReceived, this, &Client::analyzeData);
     connect(socket_, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::errorOccurred),
             this, [this](QAbstractSocket::SocketError socketError) {
         qDebug() << "Connection failed with error:" << socketError;
@@ -87,9 +86,7 @@ void Client::analyzeData(const QByteArray& data) {
 
 void Client::gotFrame()
 {
-    std::vector<uint8_t> frame(frame_array_.begin(), frame_array_.end());
-    const auto grayMat= cv::imdecode(frame, cv::IMREAD_GRAYSCALE);
-    WasmImageProvider::img = QImage(grayMat.data, grayMat.cols, grayMat.rows, grayMat.step, QImage::Format_Grayscale8);
+    WasmImageProvider::img = QImage::fromData(frame_array_);
     setFrameId();
 }
 void WasmImageProvider::restart(void)
