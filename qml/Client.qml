@@ -15,7 +15,6 @@ ApplicationWindow {
     Client{
         id:tcpclient
         address:address.text
-        port: Number(port.text)
     }
     ThemeSwitch
     {
@@ -111,16 +110,7 @@ ApplicationWindow {
                 TextField {
                     id: address
                     Layout.fillWidth: true
-                    text:"localhost"
-                }
-                Label {
-                    text: qsTr("Port:")
-                }
-                TextField {
-                    id: port
-                    validator: IntValidator { bottom: 1000; top: 1000000 }
-                    text:"9999"
-                    Layout.maximumWidth: 70
+                    text:"ws://localhost:9999"
                 }
                 Item {
                     id: name
