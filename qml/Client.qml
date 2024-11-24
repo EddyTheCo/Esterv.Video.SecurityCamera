@@ -3,6 +3,7 @@ import QtQuick.Controls
 import SecurityCamera
 import Esterv.Styles.Simple
 import Esterv.CustomControls
+import Esterv.AboutEstervSecurityCamera
 import QtQuick.Layouts
 
 ApplicationWindow {
@@ -106,6 +107,31 @@ ApplicationWindow {
                     text: qsTr("Connect")
                     onClicked: tcpclient.tryConnect()
                     Layout.alignment: Qt.AlignRight
+                }
+            }
+        }
+    }
+    Label {
+        id: aboutLabel
+        text: AboutThis.name + " " + AboutThis.version
+        anchors.bottom: parent.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+
+        MouseArea {
+            anchors.fill: parent
+            hoverEnabled: true
+
+            Popup {
+                id: aboutpop
+                visible: parent.containsMouse
+                y: -height
+                width: 300
+                height: 400
+                About {
+                    anchors.fill: parent
+                    anchors.margins: 10
+                    description: "Made with \u2764 by Esterv"
+                    logo: "https://eddytheco.github.io/Esterv.Crypto.NFTWallet/img/esterlogo.png"
                 }
             }
         }

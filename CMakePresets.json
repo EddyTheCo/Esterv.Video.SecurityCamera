@@ -2,7 +2,7 @@
   "version": 6,
   "configurePresets": [
     {
-      "name": "default-release-all",
+      "name": "default-release",
       "displayName": "Default Release",
       "description": "Release Server and Client for the same arch",
       "generator": "Ninja",
@@ -52,8 +52,8 @@
   ],
   "buildPresets": [
     {
-      "name": "default-release-all",
-      "configurePreset": "default-release-all"
+      "name": "default-release",
+      "configurePreset": "default-release"
     },
     {
       "name": "default-release-client",
@@ -84,15 +84,15 @@
   ],
   "workflowPresets": [
     {
-      "name": "default-release-all",
+      "name": "default-release",
       "steps": [
         {
           "type": "configure",
-          "name": "default-release-all"
+          "name": "default-release"
         },
         {
           "type": "build",
-          "name": "default-release-all"
+          "name": "default-release"
         }
       ]
     },
@@ -177,9 +177,9 @@
   ],
   "packagePresets": [
     {
-      "name": "default-release-all",
+      "name": "default-release",
       "description": "Release runtime components",
-      "configurePreset": "default-release-all",
+      "configurePreset": "default-release",
       "generators": [
         "IFW",
         "TGZ"
