@@ -69,15 +69,19 @@ if(BUILD_SERVER
 	endif(OpenCV_FOUND AND NOT ANDROID AND NOT EMSCRIPTEN)
 endif()
 
+
 FetchContent_Declare(
   Boost
-  GIT_REPOSITORY https://github.com/boostorg/boost.git
-  GIT_TAG boost-1.86.0
+  URL https://github.com/boostorg/boost/releases/download/boost-1.86.0/boost-1.86.0-cmake.7z
+  URL_MD5 c33bf9137ff5ff1d3d0f28af212c9704
   FIND_PACKAGE_ARGS
-  1.83
-  COMPONENTS
-  system log
-  CONFIG)
+    1.83
+   COMPONENTS
+    system log
+    CONFIG
+  )
+set(BOOST_INCLUDE_LIBRARIES asio system log)
+set(BOOST_ENABLE_CMAKE ON)
 FetchContent_MakeAvailable(Boost)
 
   add_executable(server src/server.cpp src/tcp_server.cpp src/tcp_server.hpp
