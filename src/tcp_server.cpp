@@ -29,7 +29,7 @@ void Session::doRead() {
       self->execute();
       self->doRead();
     } else {
-    std::cerr << ec.message()<<std::endl;
+      std::cerr << ec.message() << std::endl;
       self->web_socket_.async_close(boost::beast::websocket::close_code::normal,
                                     [](boost::beast::error_code ec) {});
       sessions_.extract(self->id_);
@@ -82,8 +82,7 @@ void Session::doBuff() {
         boost::asio::buffer(write_buf, write_buf.size()),
         [this, self](boost::system::error_code ec, std::size_t length) {
           if (ec) {
-	  std::cerr
-                << ec.message()<< std::endl;
+            std::cerr << ec.message() << std::endl;
             web_socket_.async_close(boost::beast::websocket::close_code::normal,
                                     [](boost::beast::error_code ec) {});
             sessions_.extract(id_);
