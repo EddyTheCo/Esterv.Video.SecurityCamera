@@ -5,7 +5,7 @@ include(${CMAKE_CURRENT_BINARY_DIR}/local_conf.cmake OPTIONAL)
 option(BUILD_CLIENT "Build Client part" ON)
 option(BUILD_SERVER "Build Server part" ON)
 option(BUILD_DOCS "Build Documentation part" OFF)
-option(QTDEPLOY "Deploy Qt libraries" OFF)
+option(QTDEPLOY "Deploy Qt libraries" ON)
 option(MOTION_DETECTION "Add motion detection and save videos on the server"
        OFF)
 
@@ -74,11 +74,6 @@ FetchContent_Declare(
   Boost
   URL https://github.com/boostorg/boost/releases/download/boost-1.86.0/boost-1.86.0-cmake.7z
   URL_MD5 c33bf9137ff5ff1d3d0f28af212c9704
-  FIND_PACKAGE_ARGS
-    1.83
-   COMPONENTS
-    system log
-    CONFIG
   )
 set(BOOST_INCLUDE_LIBRARIES asio system log)
 set(BOOST_ENABLE_CMAKE ON)
@@ -155,10 +150,12 @@ if(BUILD_CLIENT)
     COMPONENT Client
     BUNDLE DESTINATION . COMPONENT Client
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Client)
-  if(QTDEPLOY)
+  if(QTDEPLOY AND NOT EMSCRIPTEN
+	  AND NOT ANDROID)
     qt_generate_deploy_qml_app_script(TARGET client OUTPUT_SCRIPT deploy_script)
     install(SCRIPT ${deploy_script} COMPONENT Client)
-  endif(QTDEPLOY)
+  endif(QTDEPLOY    AND NOT EMSCRIPTEN
+      AND NOT ANDROID)
 
   if(EMSCRIPTEN OR ANDROID)
     target_link_libraries(
