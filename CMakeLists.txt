@@ -69,7 +69,17 @@ if(BUILD_SERVER
 	endif(OpenCV_FOUND AND NOT ANDROID AND NOT EMSCRIPTEN)
 endif()
 
-  find_package(Boost REQUIRED COMPONENTS system log)
+FetchContent_Declare(
+  Boost
+  GIT_REPOSITORY https://github.com/boostorg/boost.git
+  GIT_TAG boost-1.86.0
+  FIND_PACKAGE_ARGS
+  1.83
+  COMPONENTS
+  system log
+  CONFIG)
+FetchContent_MakeAvailable(Boost)
+
   add_executable(server src/server.cpp src/tcp_server.cpp src/tcp_server.hpp
                         src/camera_service.hpp src/camera_service.cpp)
   target_link_libraries(server PRIVATE ${OpenCV_LIBS} Boost::system Boost::log)
