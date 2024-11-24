@@ -13,7 +13,6 @@ Session::Session(boost::asio::ip::tcp::tcp::socket socket)
 }
 
 void Session::start() {
-  BOOST_LOG_TRIVIAL(debug) << __PRETTY_FUNCTION__;
   web_socket_.async_accept(
       [self = shared_from_this()](boost::system::error_code ec) {
         if (!ec)
@@ -31,7 +30,7 @@ void Session::doRead() {
       self->execute();
       self->doRead();
     } else {
-      BOOST_LOG_TRIVIAL(error) << __PRETTY_FUNCTION__ << " " << ec.message();
+      BOOST_LOG_TRIVIAL(error) << " " << ec.message();
       self->web_socket_.async_close(boost::beast::websocket::close_code::normal,
                                     [](boost::beast::error_code ec) {});
       sessions_.extract(self->id_);
@@ -85,7 +84,7 @@ void Session::doBuff() {
         [this, self](boost::system::error_code ec, std::size_t length) {
           if (ec) {
             BOOST_LOG_TRIVIAL(error)
-                << __PRETTY_FUNCTION__ << " " << ec.message();
+                << " " << ec.message();
             web_socket_.async_close(boost::beast::websocket::close_code::normal,
                                     [](boost::beast::error_code ec) {});
             sessions_.extract(id_);
