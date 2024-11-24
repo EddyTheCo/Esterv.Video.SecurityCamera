@@ -119,7 +119,7 @@ if(BUILD_CLIENT)
   endif(EMSCRIPTEN OR ANDROID)
   find_package(
     Qt6 REQUIRED
-    COMPONENTS Core Gui Quick
+    COMPONENTS Core Gui Qml Quick
     OPTIONAL_COMPONENTS WebSockets)
   qt_standard_project_setup()
   if(NOT TARGET Qt6::WebSockets)
