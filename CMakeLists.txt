@@ -81,7 +81,7 @@ FetchContent_MakeAvailable(Boost)
 
   add_executable(server src/server.cpp src/tcp_server.cpp src/tcp_server.hpp
                         src/camera_service.hpp src/camera_service.cpp)
-  target_link_libraries(server PRIVATE ${OpenCV_LIBS} Boost::system Boost::log)
+  target_link_libraries(server PRIVATE ${OpenCV_LIBS} Boost::asio Boost::system Boost::log)
 
   if(MOTION_DETECTION)
     target_compile_definitions(server PRIVATE MOTION_DETECTION)
