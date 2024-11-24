@@ -75,18 +75,18 @@ FetchContent_Declare(
   URL https://github.com/boostorg/boost/releases/download/boost-1.86.0/boost-1.86.0-cmake.7z
   URL_MD5 c33bf9137ff5ff1d3d0f28af212c9704
   FIND_PACKAGE_ARGS
-    1.83
+    1.86
    COMPONENTS
-    system log
+    system
     CONFIG
   )
-set(BOOST_INCLUDE_LIBRARIES asio beast system log)
+set(BOOST_INCLUDE_LIBRARIES asio beast system)
 set(BOOST_ENABLE_CMAKE ON)
 FetchContent_MakeAvailable(Boost)
 
   add_executable(server src/server.cpp src/tcp_server.cpp src/tcp_server.hpp
                         src/camera_service.hpp src/camera_service.cpp)
-  target_link_libraries(server PRIVATE ${OpenCV_LIBS} Boost::asio Boost::beast Boost::system Boost::log)
+  target_link_libraries(server PRIVATE ${OpenCV_LIBS} Boost::asio Boost::beast Boost::system)
 
   if(MOTION_DETECTION)
     target_compile_definitions(server PRIVATE MOTION_DETECTION)

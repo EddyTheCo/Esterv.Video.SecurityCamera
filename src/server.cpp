@@ -1,7 +1,6 @@
 #include "camera_service.hpp"
 #include "tcp_server.hpp"
 #include <boost/asio/io_context.hpp>
-#include <boost/log/trivial.hpp>
 int main() {
   boost::asio::io_context io_context;
 
