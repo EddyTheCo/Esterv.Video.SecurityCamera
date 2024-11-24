@@ -1,7 +1,6 @@
 #include "tcp_server.hpp"
 #include "camera_service.hpp"
-#include <boost/log/trivial.hpp>
-
+#include <iostream>
 using boost::asio::ip::tcp;
 
 std::unordered_map<size_t, std::shared_ptr<Session>> Session::sessions_;
@@ -13,7 +12,6 @@ Session::Session(boost::asio::ip::tcp::tcp::socket socket)
 }
 
 void Session::start() {
-  BOOST_LOG_TRIVIAL(debug) << __PRETTY_FUNCTION__;
   web_socket_.async_accept(
       [self = shared_from_this()](boost::system::error_code ec) {
         if (!ec)
@@ -31,7 +29,7 @@ void Session::doRead() {
       self->execute();
       self->doRead();
     } else {
-      BOOST_LOG_TRIVIAL(error) << __PRETTY_FUNCTION__ << " " << ec.message();
+      std::cerr << ec.message() << std::endl;
       self->web_socket_.async_close(boost::beast::websocket::close_code::normal,
                                     [](boost::beast::error_code ec) {});
       sessions_.extract(self->id_);
@@ -84,8 +82,7 @@ void Session::doBuff() {
         boost::asio::buffer(write_buf, write_buf.size()),
         [this, self](boost::system::error_code ec, std::size_t length) {
           if (ec) {
-            BOOST_LOG_TRIVIAL(error)
-                << __PRETTY_FUNCTION__ << " " << ec.message();
+            std::cerr << ec.message() << std::endl;
             web_socket_.async_close(boost::beast::websocket::close_code::normal,
                                     [](boost::beast::error_code ec) {});
             sessions_.extract(id_);
