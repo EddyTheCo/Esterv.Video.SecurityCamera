@@ -107,6 +107,7 @@ if(BUILD_CLIENT)
     SimpleStyle
     CustomControls
     FlatControl
+    EstervAbout${CMAKE_PROJECT_NAME}
     CONFIG)
   FetchContent_MakeAvailable(EstervDesigns)
   if(EMSCRIPTEN OR ANDROID)
@@ -128,7 +129,8 @@ if(BUILD_CLIENT)
   qt_add_executable(client src/client.cpp src/tcp_client.hpp src/tcp_client.cpp)
   target_include_directories(client PRIVATE src)
   target_link_libraries(client PRIVATE ${OpenCV_LIBS} Qt6::Core Qt6::WebSockets
-                                       Qt6::Gui Qt6::Quick Esterv::SimpleStyle)
+                                       Qt6::Gui Qt6::Quick Esterv::SimpleStyle Esterv::About${CMAKE_PROJECT_NAME}
+				   $<$<STREQUAL:$<TARGET_PROPERTY:Esterv::About${CMAKE_PROJECT_NAME},TYPE>,STATIC_LIBRARY>:Esterv::About${CMAKE_PROJECT_NAME}plugin>)
   set_target_properties(client PROPERTIES WIN32_EXECUTABLE ON MACOSX_BUNDLE ON)
 
   qt6_add_qml_module(
