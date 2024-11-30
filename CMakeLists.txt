@@ -32,7 +32,7 @@ include(GNUInstallDirs)
 if(BUILD_SERVER
    AND NOT EMSCRIPTEN
    AND NOT ANDROID)
-  find_package(OpenCV COMPONENTS core imgproc videoio video)
+  find_package(OpenCV COMPONENTS core imgproc imgcodecs videoio video)
 
   if(NOT OpenCV_FOUND)
     set(builturl
@@ -64,7 +64,7 @@ if(BUILD_SERVER
       if(WIN32)
         set(OpenCV_DIR ${opencv_SOURCE_DIR})
       endif(WIN32)
-      find_package(OpenCV COMPONENTS core imgproc videoio video)
+      find_package(OpenCV COMPONENTS core imgproc imgcodecs videoio video)
     endif()
     if(OpenCV_FOUND
        AND NOT ANDROID
