@@ -204,16 +204,6 @@ if(BUILD_CLIENT)
       APPEND
       PROPERTY QT_ANDROID_SDK_BUILD_TOOLS_REVISION 34.0.0)
 
-    FetchContent_Declare(
-      android_openssl
-      DOWNLOAD_EXTRACT_TIMESTAMP true
-      URL https://github.com/KDAB/android_openssl/archive/refs/heads/master.zip)
-    FetchContent_GetProperties(android_openssl)
-    if(NOT android_openssl_POPULATED)
-      FetchContent_Populate(android_openssl)
-      include(${android_openssl_SOURCE_DIR}/android_openssl.cmake)
-      add_android_openssl_libraries(client)
-    endif(NOT android_openssl_POPULATED)
   endif(ANDROID)
   if(EMSCRIPTEN)
     add_custom_command(
