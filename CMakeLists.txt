@@ -189,12 +189,13 @@ if(BUILD_CLIENT)
                                PRIVATE FORCE_STYLE="Esterv.Controls.Flat")
   endif(EMSCRIPTEN OR ANDROID)
   if(ANDROID)
-	  set_target_properties(client PROPERTIES
-	   QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android"
-	   QT_ANDROID_MIN_SDK_VERSION 30
-	   QT_ANDROID_TARGET_SDK_VERSION 34
-	   QT_ANDROID_SDK_BUILD_TOOLS_REVISION 34.0.0
-	  )
+    set_target_properties(
+      client
+      PROPERTIES QT_ANDROID_PACKAGE_SOURCE_DIR
+                 "${CMAKE_CURRENT_SOURCE_DIR}/android"
+                 QT_ANDROID_MIN_SDK_VERSION 30
+                 QT_ANDROID_TARGET_SDK_VERSION 34
+                 QT_ANDROID_SDK_BUILD_TOOLS_REVISION 34.0.0)
   endif(ANDROID)
   if(EMSCRIPTEN)
     add_custom_command(
