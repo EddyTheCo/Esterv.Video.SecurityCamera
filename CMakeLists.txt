@@ -156,7 +156,7 @@ if(BUILD_CLIENT)
     VERSION
     1.0
     QML_FILES
-    "qml/Client.qml"
+    "qml/client.qml"
     RESOURCE_PREFIX
     "/esterVtech.com/imports"
     IMPORT_PATH

@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
   QQmlApplicationEngine engine;
   engine.addImageProvider(QLatin1String("wasm"), new WasmImageProvider());
   engine.addImportPath("qrc:/esterVtech.com/imports");
-  const QUrl url("qrc:/esterVtech.com/imports/SecurityCamera/qml/Client.qml");
+  const QUrl url("qrc:/esterVtech.com/imports/SecurityCamera/qml/client.qml");
   engine.load(url);
   return app.exec();
 }
