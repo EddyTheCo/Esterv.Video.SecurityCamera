@@ -32,7 +32,7 @@ include(GNUInstallDirs)
 if(BUILD_SERVER
    AND NOT EMSCRIPTEN
    AND NOT ANDROID)
-  find_package(OpenCV COMPONENTS core imgproc videoio video)
+  find_package(OpenCV COMPONENTS core imgproc imgcodecs videoio video)
 
   if(NOT OpenCV_FOUND)
     set(builturl
@@ -64,7 +64,7 @@ if(BUILD_SERVER
       if(WIN32)
         set(OpenCV_DIR ${opencv_SOURCE_DIR})
       endif(WIN32)
-      find_package(OpenCV COMPONENTS core imgproc videoio video)
+      find_package(OpenCV COMPONENTS core imgproc imgcodecs videoio video)
     endif()
     if(OpenCV_FOUND
        AND NOT ANDROID
@@ -156,7 +156,7 @@ if(BUILD_CLIENT)
     VERSION
     1.0
     QML_FILES
-    "qml/Client.qml"
+    "qml/client.qml"
     RESOURCE_PREFIX
     "/esterVtech.com/imports"
     IMPORT_PATH
@@ -189,31 +189,12 @@ if(BUILD_CLIENT)
                                PRIVATE FORCE_STYLE="Esterv.Controls.Flat")
   endif(EMSCRIPTEN OR ANDROID)
   if(ANDROID)
-    set_property(TARGET client PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-                                        "${CMAKE_CURRENT_SOURCE_DIR}/android")
-    set_property(
-      TARGET client
-      APPEND
-      PROPERTY QT_ANDROID_MIN_SDK_VERSION 30)
-    set_property(
-      TARGET client
-      APPEND
-      PROPERTY QT_ANDROID_TARGET_SDK_VERSION 34)
-    set_property(
-      TARGET client
-      APPEND
-      PROPERTY QT_ANDROID_SDK_BUILD_TOOLS_REVISION 34.0.0)
-
-    FetchContent_Declare(
-      android_openssl
-      DOWNLOAD_EXTRACT_TIMESTAMP true
-      URL https://github.com/KDAB/android_openssl/archive/refs/heads/master.zip)
-    FetchContent_GetProperties(android_openssl)
-    if(NOT android_openssl_POPULATED)
-      FetchContent_Populate(android_openssl)
-      include(${android_openssl_SOURCE_DIR}/android_openssl.cmake)
-      add_android_openssl_libraries(client)
-    endif(NOT android_openssl_POPULATED)
+	  set_target_properties(client PROPERTIES
+	   QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android"
+	   QT_ANDROID_MIN_SDK_VERSION 30
+	   QT_ANDROID_TARGET_SDK_VERSION 34
+	   QT_ANDROID_SDK_BUILD_TOOLS_REVISION 34.0.0
+	  )
   endif(ANDROID)
   if(EMSCRIPTEN)
     add_custom_command(
