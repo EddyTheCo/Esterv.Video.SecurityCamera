@@ -17,7 +17,7 @@ jobs:
     with:
       os: ${{ matrix.os }}
       qtModules: 'qtwebsockets qtshadertools'
-      qtVersion: '6.8.0'
+      qtVersion: '6.8.1'
   build-android:
     strategy:
       matrix:
@@ -27,7 +27,7 @@ jobs:
     with:
       qtModules: 'qtwebsockets qtshadertools'
       qtTarget: 'client'
-      qtVersion: '6.8.0'
+      qtVersion: '6.8.1'
       qtArch: ${{ matrix.qtArch }}
     secrets:
       QT_ANDROID_KEYSTORE_STORE_PASS:  ${{ secrets.QT_ANDROID_KEYSTORE_STORE_PASS }}
