@@ -34,7 +34,7 @@ ApplicationWindow {
             id: player
             Layout.fillHeight: true
             Layout.fillWidth: true
-            Layout.minimumWidth: (grid.iscolumn)?300:600
+            Layout.minimumWidth: (grid.iscolumn) ? 300 : 600
             Layout.minimumHeight: 300
             Rectangle {
                 id: showIsConected
@@ -81,7 +81,7 @@ ApplicationWindow {
         }
         Frame {
             id: serverConf
-            Layout.alignment: (grid.iscolumn)?Qt.AlignBottom|Qt.AlignHCenter:Qt.AlignVCenter|Qt.AlignRight
+            Layout.alignment: (grid.iscolumn) ? Qt.AlignBottom | Qt.AlignHCenter : Qt.AlignVCenter | Qt.AlignRight
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.maximumWidth: 400
