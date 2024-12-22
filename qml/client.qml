@@ -117,13 +117,14 @@ ApplicationWindow {
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
 
-        MouseArea {
+	MouseArea {
+	    id: aboutMouseArea
             anchors.fill: parent
             hoverEnabled: true
 
             Popup {
                 id: aboutpop
-                visible: parent.containsMouse
+                visible: aboutMouseArea.containsMouse
                 y: -height
                 width: 300
                 height: 400
