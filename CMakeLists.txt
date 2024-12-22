@@ -13,7 +13,7 @@ include(FetchContent)
 FetchContent_Declare(
   ccommon
   GIT_REPOSITORY https://github.com/EddyTheCo/Common.git
-  GIT_TAG ndk26)
+  GIT_TAG v0.5.0)
 FetchContent_MakeAvailable(ccommon)
 version_from_git(LOG OFF TIMESTAMP "%Y%m%d%H%M%S")
 project(
@@ -28,6 +28,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 include(GNUInstallDirs)
+include(InstallRequiredSystemLibraries)
 
 if(BUILD_SERVER
    AND NOT EMSCRIPTEN
@@ -107,7 +108,7 @@ if(BUILD_CLIENT)
   FetchContent_Declare(
     EstervDesigns
     GIT_REPOSITORY https://github.com/EddyTheCo/Esterv.Designs.git
-    GIT_TAG develop
+    GIT_TAG v2.0.0 
     FIND_PACKAGE_ARGS
     2
     COMPONENTS
@@ -196,6 +197,16 @@ if(BUILD_CLIENT)
                  QT_ANDROID_MIN_SDK_VERSION 30
                  QT_ANDROID_TARGET_SDK_VERSION 34
                  QT_ANDROID_SDK_BUILD_TOOLS_REVISION 34.0.0)
+FetchContent_Declare(
+      android_openssl
+      DOWNLOAD_EXTRACT_TIMESTAMP true
+      URL https://github.com/KDAB/android_openssl/archive/refs/heads/master.zip)
+    FetchContent_GetProperties(android_openssl)
+    if(NOT android_openssl_POPULATED)
+      FetchContent_Populate(android_openssl)
+      include(${android_openssl_SOURCE_DIR}/android_openssl.cmake)
+      add_android_openssl_libraries(client)
+    endif(NOT android_openssl_POPULATED)	 
   endif(ANDROID)
   if(EMSCRIPTEN)
     add_custom_command(

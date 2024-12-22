@@ -39,8 +39,8 @@ ApplicationWindow {
             Rectangle {
                 id: showIsConected
 
-                //topRightRadius:Math.max(width,height)*0.5
-                //bottomRightRadius:topRightRadius
+                topRightRadius:Math.max(width,height)*0.5
+                bottomRightRadius:topRightRadius
 
                 Layout.minimumHeight: 60
                 Layout.minimumWidth: 180
@@ -117,13 +117,14 @@ ApplicationWindow {
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
 
-        MouseArea {
+	MouseArea {
+	    id: aboutMouseArea
             anchors.fill: parent
             hoverEnabled: true
 
             Popup {
                 id: aboutpop
-                visible: parent.containsMouse
+                visible: aboutMouseArea.containsMouse
                 y: -height
                 width: 300
                 height: 400
