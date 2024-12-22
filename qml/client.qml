@@ -34,13 +34,13 @@ ApplicationWindow {
             id: player
             Layout.fillHeight: true
             Layout.fillWidth: true
-            Layout.minimumWidth: 600
+            Layout.minimumWidth: (grid.iscolumn) ? 300 : 600
             Layout.minimumHeight: 300
             Rectangle {
                 id: showIsConected
 
-                //topRightRadius:Math.max(width,height)*0.5
-                //bottomRightRadius:topRightRadius
+                topRightRadius: Math.max(width, height) * 0.5
+                bottomRightRadius: topRightRadius
 
                 Layout.minimumHeight: 60
                 Layout.minimumWidth: 180
@@ -81,7 +81,7 @@ ApplicationWindow {
         }
         Frame {
             id: serverConf
-            Layout.alignment: Qt.AlignCenter
+            Layout.alignment: (grid.iscolumn) ? Qt.AlignBottom | Qt.AlignHCenter : Qt.AlignVCenter | Qt.AlignRight
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.maximumWidth: 400
@@ -118,12 +118,13 @@ ApplicationWindow {
         anchors.horizontalCenter: parent.horizontalCenter
 
         MouseArea {
+            id: aboutMouseArea
             anchors.fill: parent
             hoverEnabled: true
 
             Popup {
                 id: aboutpop
-                visible: parent.containsMouse
+                visible: aboutMouseArea.containsMouse
                 y: -height
                 width: 300
                 height: 400
