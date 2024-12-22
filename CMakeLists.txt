@@ -13,7 +13,7 @@ include(FetchContent)
 FetchContent_Declare(
   ccommon
   GIT_REPOSITORY https://github.com/EddyTheCo/Common.git
-  GIT_TAG ndk26)
+  GIT_TAG v0.5.0)
 FetchContent_MakeAvailable(ccommon)
 version_from_git(LOG OFF TIMESTAMP "%Y%m%d%H%M%S")
 project(
@@ -28,6 +28,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 include(GNUInstallDirs)
+include(InstallRequiredSystemLibraries)
 
 if(BUILD_SERVER
    AND NOT EMSCRIPTEN
@@ -107,7 +108,7 @@ if(BUILD_CLIENT)
   FetchContent_Declare(
     EstervDesigns
     GIT_REPOSITORY https://github.com/EddyTheCo/Esterv.Designs.git
-    GIT_TAG develop
+    GIT_TAG v2.0.0 
     FIND_PACKAGE_ARGS
     2
     COMPONENTS
