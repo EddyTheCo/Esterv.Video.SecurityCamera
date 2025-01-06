@@ -6,7 +6,7 @@
       "displayName": "Default Release",
       "description": "Release Server and Client for the same arch",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/release",
+      "binaryDir": "${sourceDir}/build/${presetName}",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "REPO_URL": "https://eddytheco.github.io/Esterv.Video.SecurityCamera"
@@ -44,7 +44,6 @@
       "displayName": "Default Config for development(Debug)",
       "description": "Debug build type using Ninja generator",
       "inherits": "default-develop",
-      "binaryDir": "${sourceDir}/build/debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       }
@@ -188,36 +187,28 @@
         "CPACK_PACKAGE_CONTACT": "estervtech@gmail.com",
         "CPACK_PACKAGE_VENDOR": "estervtech"
       },
-      "packageDirectory": "packages"
+      "packageDirectory": "packages-${presetName}"
     },
     {
       "name": "default-release-client",
-      "description": "Release Client",
+      "description": "Release Client Only",
       "configurePreset": "default-release-client",
-      "generators": [
-        "IFW",
-        "TGZ"
-      ],
-      "variables": {
-        "CPACK_PACKAGE_CONTACT": "estervtech@gmail.com",
-        "CPACK_PACKAGE_VENDOR": "estervtech"
-      },
-      "packageDirectory": "packages"
+      "inherits": "default-release"
+    },
+    {
+      "name": "default-release-server",
+      "description": "Release Server Only",
+      "configurePreset": "default-release-server",
+      "inherits": "default-release"
     },
     {
       "name": "default-develop",
       "description": "Release development components",
       "configurePreset": "default-develop",
-      "generators": [
-        "IFW",
-        "TGZ"
-      ],
+      "inherits": "default-release",
       "variables": {
-        "CPACK_COMPONENTS_GROUPING": "ALL_COMPONENTS_IN_ONE",
-        "CPACK_PACKAGE_CONTACT": "estervtech@gmail.com",
-        "CPACK_PACKAGE_VENDOR": "estervtech"
-      },
-      "packageDirectory": "packages-dev"
+        "CPACK_COMPONENTS_GROUPING": "ALL_COMPONENTS_IN_ONE"
+      }
     }
   ]
 }
