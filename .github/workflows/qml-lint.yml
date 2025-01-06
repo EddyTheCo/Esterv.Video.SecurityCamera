@@ -7,8 +7,8 @@ on:
     types:
       - completed
 jobs:
-  checkout-format-pr:
-    uses: EddyTheCo/Common/.github/workflows/qml-lint.yml@develop
+  qmllint-comment:
+    uses: EddyTheCo/Common/.github/workflows/qml-lint.yml@0.5.2
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     permissions:
       actions: read
